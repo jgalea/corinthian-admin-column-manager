@@ -1,0 +1,56 @@
+.corinthian-app { max-width: 960px; margin-top: 16px; }
+.corinthian-bar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 20px; margin-bottom: 16px; }
+.corinthian-bar .components-base-control { min-width: min(100%, 260px); }
+.corinthian-bar__link { margin-bottom: 8px; }
+.corinthian-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+.corinthian-tab { min-height: 36px; padding: 0 14px; border: 1px solid #8c8f94; background: #fff; border-radius: 2px; cursor: pointer; color: #1d2327; max-width: 100%; overflow-wrap: anywhere; }
+.corinthian-tab.is-active { border: 2px solid #2271b1; background: #f0f6fc; font-weight: 600; padding: 0 13px; }
+.corinthian-tab:focus-visible { outline: 2px solid #2271b1; outline-offset: 2px; }
+.corinthian-card { background: #fff; border: 1px solid #c3c4c7; padding: 16px; margin-bottom: 16px; display: grid; gap: 16px; }
+.corinthian-heading { margin: 0; padding: 0; font-size: 1.1em; }
+.corinthian-muted { margin: 0; color: #50575e; }
+.corinthian-roles { border: 0; margin: 0; padding: 0; min-width: 0; }
+.corinthian-roles legend { font-weight: 600; margin-bottom: 8px; }
+.corinthian-roles__list { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.corinthian-toggles { display: flex; flex-wrap: wrap; gap: 12px 32px; }
+.corinthian-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.corinthian-row { border: 1px solid #c3c4c7; background: #fff; min-width: 0; }
+.corinthian-row.is-dragging { opacity: .5; }
+.corinthian-row.is-drop-target { border-color: #2271b1; border-top-width: 4px; }
+.corinthian-row__main { display: grid; grid-template-columns: 24px 36px minmax(0, 1fr) auto auto; align-items: center; gap: 8px; padding: 8px; }
+.corinthian-row__handle { cursor: grab; color: #50575e; display: inline-flex; }
+.corinthian-row__toggle.is-open svg { transform: rotate(90deg); }
+.corinthian-row__title { display: flex; flex-direction: column; min-width: 0; }
+.corinthian-row__label { font-weight: 600; overflow-wrap: anywhere; }
+.corinthian-row__type { color: #50575e; font-size: 12px; overflow-wrap: anywhere; }
+.corinthian-row__width { display: flex; gap: 4px; }
+.corinthian-row__width .components-base-control:first-child { width: 88px; }
+.corinthian-row__width .components-base-control:last-child { width: 72px; }
+.corinthian-row__actions { display: flex; }
+.corinthian-row__panel { display: grid; gap: 12px; padding: 12px 12px 16px 44px; border-top: 1px solid #dcdcde; background: #f6f7f7; }
+.corinthian-add { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.corinthian-add__field { display: grid; gap: 4px; min-width: min(100%, 260px); }
+.corinthian-add__label { font-size: 11px; font-weight: 500; text-transform: none; }
+.corinthian-select { min-height: 40px; max-width: 100%; }
+.corinthian-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.corinthian-footer__spacer { flex: 1 1 0; }
+.corinthian-dirty { font-weight: 600; color: #614200; background: #fcf9e8; border: 1px solid #996800; padding: 2px 8px; }
+.corinthian-empty__actions, .corinthian-modal-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+.corinthian-modal-actions { justify-content: flex-end; margin-top: 16px; }
+@media (max-width: 640px) {
+	.corinthian-row__main { grid-template-columns: 24px 36px minmax(0, 1fr); }
+	.corinthian-row__width, .corinthian-row__actions { grid-column: 2 / -1; }
+	.corinthian-row__panel { padding-left: 12px; }
+}
+.corinthian-app .components-base-control__label,
+.corinthian-app .components-input-control__label,
+.corinthian-app label { text-transform: none; font-size: 13px; font-weight: 500; letter-spacing: 0; }
+.corinthian-row__toggle svg { transition: none; }
+.corinthian-app *, .corinthian-app *::before { text-transform: none !important; }
+.corinthian-app [class*="label"] { font-size: 13px; font-weight: 500; letter-spacing: 0; }
+.corinthian-row__flags { display: flex; flex-wrap: wrap; gap: 12px 32px; }
+
+.corinthian-row__unavailable {
+	font-size: 12px;
+	color: #757575;
+}

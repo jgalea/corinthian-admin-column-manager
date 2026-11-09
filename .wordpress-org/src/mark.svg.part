@@ -1,0 +1,35 @@
+<g transform="translate(0,-8)" fill="currentColor" stroke="var(--bg)" stroke-linejoin="round">
+  <!-- volutes -->
+  <circle cx="74" cy="87" r="18" stroke="none"/>
+  <circle cx="182" cy="87" r="18" stroke="none"/>
+  <circle cx="74" cy="87" r="8" fill="var(--bg)" stroke="none"/>
+  <circle cx="182" cy="87" r="8" fill="var(--bg)" stroke="none"/>
+  <circle cx="74" cy="87" r="3.4" stroke="none"/>
+  <circle cx="182" cy="87" r="3.4" stroke="none"/>
+  <!-- bell -->
+  <path d="M86 64 H170 L160 136 H96 Z" stroke="none"/>
+  <!-- back leaves -->
+  <path id="leaf2" d="M0 0 C-17 -8 -20 -34 -6 -46 C-2 -49 2 -49 6 -46 C20 -34 17 -8 0 0 Z" transform="translate(109,134) rotate(-9)" stroke-width="3"/>
+  <path d="M0 0 C-17 -8 -20 -34 -6 -46 C-2 -49 2 -49 6 -46 C20 -34 17 -8 0 0 Z" transform="translate(147,134) rotate(9)" stroke-width="3"/>
+  <!-- front leaves -->
+  <path d="M0 0 C-24 -10 -29 -46 -9 -63 C-4 -67 4 -67 9 -63 C29 -46 24 -10 0 0 Z" transform="translate(98,170) rotate(-17)" stroke-width="3.5"/>
+  <path d="M0 0 C-24 -10 -29 -46 -9 -63 C-4 -67 4 -67 9 -63 C29 -46 24 -10 0 0 Z" transform="translate(158,170) rotate(17)" stroke-width="3.5"/>
+  <path d="M0 0 C-25 -10 -30 -50 -9 -68 C-4 -72 4 -72 9 -68 C30 -50 25 -10 0 0 Z" transform="translate(128,172)" stroke-width="3.5"/>
+  <g fill="none" stroke-width="2.4" stroke-linecap="round">
+    <path d="M128 164 V118"/>
+    <path d="M99 162 Q93 140 90 124" transform="rotate(0)"/>
+    <path d="M157 162 Q163 140 166 124"/>
+  </g>
+  <!-- abacus -->
+  <rect x="47" y="40" width="162" height="16" rx="2" stroke="none"/>
+  <rect x="57" y="56" width="142" height="9" rx="2" stroke="none"/>
+  <!-- astragal and shaft -->
+  <rect x="92" y="171" width="72" height="7" rx="3.5" stroke="none"/>
+  <path d="M99 178 H157 L162 222 H94 Z" stroke="none"/>
+  <g fill="none" stroke="var(--bg)" stroke-width="3.6" stroke-linecap="round">
+    <path d="M113 188 V214"/><path d="M128 188 V214"/><path d="M143 188 V214"/>
+  </g>
+  <!-- base -->
+  <rect x="83" y="222" width="90" height="9" rx="2" stroke="none"/>
+  <rect x="73" y="231" width="110" height="8" rx="2" stroke="none"/>
+</g>

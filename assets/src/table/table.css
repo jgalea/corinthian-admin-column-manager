@@ -1,0 +1,71 @@
+.wp-list-table thead th.manage-column {
+	position: relative;
+}
+
+.corinthian-resize {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-end: -4px;
+	inline-size: 8px;
+	cursor: col-resize;
+	z-index: 3;
+	touch-action: none;
+}
+
+.corinthian-resize::after {
+	content: "";
+	position: absolute;
+	inset-block: 25%;
+	inset-inline-start: 3px;
+	inline-size: 2px;
+	border-radius: 1px;
+	background: transparent;
+	transition: background-color 0.15s;
+}
+
+.corinthian-resize:hover::after,
+.corinthian-resize:focus-visible::after,
+.corinthian-resizing .corinthian-resize::after {
+	background: var(--wp-admin-theme-color, #2271b1);
+}
+
+.corinthian-resize:focus-visible {
+	outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+	outline-offset: -2px;
+}
+
+.corinthian-resizing,
+.corinthian-resizing * {
+	cursor: col-resize !important;
+	user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.corinthian-resize::after {
+		transition: none;
+	}
+}
+
+/* The last column's edge can sit at the scroll container's clip line. */
+.wp-list-table thead th.manage-column:last-child .corinthian-resize {
+	inset-inline-end: 0;
+}
+
+/* Toolbar: filter bar and bulk edit side by side */
+.corinthian-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 8px;
+	margin-block: 8px 12px;
+	max-inline-size: 100%;
+}
+
+.corinthian-toolbar:empty {
+	display: none;
+}
+
+.corinthian-toolbar > * {
+	min-inline-size: 0;
+	max-inline-size: 100%;
+}
