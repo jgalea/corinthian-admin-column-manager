@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Users;
 
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Preset over user meta that other plugins already write. Corinthian tracks no logins itself.
  */

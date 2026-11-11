@@ -6,6 +6,8 @@ use Corinthian\Import\AdminColumnsImporter;
 use Corinthian\Plugin;
 use WP_CLI;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ImportCommand {
 
 	/**

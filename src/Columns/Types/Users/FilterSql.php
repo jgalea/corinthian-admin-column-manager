@@ -2,6 +2,8 @@
 
 namespace Corinthian\Columns\Types\Users;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * SQL builders shared by the user, media, comment and term filters.
  *
@@ -44,36 +46,110 @@ final class FilterSql {
 		switch ( $kind ) {
 			case self::NUMBER:
 				return array(
-					array( 'op' => 'eq', 'label' => '=', 'input' => 'number' ),
-					array( 'op' => 'neq', 'label' => '≠', 'input' => 'number' ),
-					array( 'op' => 'gt', 'label' => '>', 'input' => 'number' ),
-					array( 'op' => 'lt', 'label' => '<', 'input' => 'number' ),
-					array( 'op' => 'between', 'label' => __( 'between', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
+					array(
+						'op'    => 'eq',
+						'label' => '=',
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'neq',
+						'label' => '≠',
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'gt',
+						'label' => '>',
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'lt',
+						'label' => '<',
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'between',
+						'label' => __( 'between', 'corinthian-admin-column-manager' ),
+						'input' => 'number',
+					),
 				);
 			case self::DATE:
 				return array(
-					array( 'op' => 'before', 'label' => __( 'before', 'corinthian-admin-column-manager' ), 'input' => 'date' ),
-					array( 'op' => 'after', 'label' => __( 'after', 'corinthian-admin-column-manager' ), 'input' => 'date' ),
-					array( 'op' => 'within_days', 'label' => __( 'in the last (days)', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
-					array( 'op' => 'older_than_days', 'label' => __( 'older than (days)', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
+					array(
+						'op'    => 'before',
+						'label' => __( 'before', 'corinthian-admin-column-manager' ),
+						'input' => 'date',
+					),
+					array(
+						'op'    => 'after',
+						'label' => __( 'after', 'corinthian-admin-column-manager' ),
+						'input' => 'date',
+					),
+					array(
+						'op'    => 'within_days',
+						'label' => __( 'in the last (days)', 'corinthian-admin-column-manager' ),
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'older_than_days',
+						'label' => __( 'older than (days)', 'corinthian-admin-column-manager' ),
+						'input' => 'number',
+					),
 				);
 			case self::ENUM:
 				return array(
-					array( 'op' => 'in', 'label' => __( 'is any of', 'corinthian-admin-column-manager' ), 'input' => 'select', 'options' => $options ),
-					array( 'op' => 'not_in', 'label' => __( 'is none of', 'corinthian-admin-column-manager' ), 'input' => 'select', 'options' => $options ),
+					array(
+						'op'      => 'in',
+						'label'   => __( 'is any of', 'corinthian-admin-column-manager' ),
+						'input'   => 'select',
+						'options' => $options,
+					),
+					array(
+						'op'      => 'not_in',
+						'label'   => __( 'is none of', 'corinthian-admin-column-manager' ),
+						'input'   => 'select',
+						'options' => $options,
+					),
 				);
 			case self::BOOL:
 				return array(
-					array( 'op' => 'eq', 'label' => __( 'is', 'corinthian-admin-column-manager' ), 'input' => 'select', 'options' => array( '1' => __( 'Yes', 'corinthian-admin-column-manager' ), '0' => __( 'No', 'corinthian-admin-column-manager' ) ) ),
+					array(
+						'op'      => 'eq',
+						'label'   => __( 'is', 'corinthian-admin-column-manager' ),
+						'input'   => 'select',
+						'options' => array(
+							'1' => __( 'Yes', 'corinthian-admin-column-manager' ),
+							'0' => __( 'No', 'corinthian-admin-column-manager' ),
+						),
+					),
 				);
 			default:
 				return array_merge(
 					array(
-						array( 'op' => 'contains', 'label' => __( 'contains', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-						array( 'op' => 'not_contains', 'label' => __( 'does not contain', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-						array( 'op' => 'eq', 'label' => __( 'is', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-						array( 'op' => 'neq', 'label' => __( 'is not', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-						array( 'op' => 'starts', 'label' => __( 'starts with', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
+						array(
+							'op'    => 'contains',
+							'label' => __( 'contains', 'corinthian-admin-column-manager' ),
+							'input' => 'text',
+						),
+						array(
+							'op'    => 'not_contains',
+							'label' => __( 'does not contain', 'corinthian-admin-column-manager' ),
+							'input' => 'text',
+						),
+						array(
+							'op'    => 'eq',
+							'label' => __( 'is', 'corinthian-admin-column-manager' ),
+							'input' => 'text',
+						),
+						array(
+							'op'    => 'neq',
+							'label' => __( 'is not', 'corinthian-admin-column-manager' ),
+							'input' => 'text',
+						),
+						array(
+							'op'    => 'starts',
+							'label' => __( 'starts with', 'corinthian-admin-column-manager' ),
+							'input' => 'text',
+						),
 					),
 					$empty
 				);
@@ -109,7 +185,7 @@ final class FilterSql {
 	 * @param array{table:string,id_column:string,outer_id:string,key:string,template?:string} $meta
 	 */
 	public static function meta( string $kind, string $op, mixed $value, array $meta, string $alias ): ?string {
-		$alias = preg_replace( '/[^A-Za-z0-9_]/', '', $alias );
+		$alias      = preg_replace( '/[^A-Za-z0-9_]/', '', $alias );
 		$value_expr = str_replace( '__V__', "{$alias}.meta_value", $meta['template'] ?? '__V__' );
 
 		if ( 'empty' === $op || 'not_empty' === $op ) {

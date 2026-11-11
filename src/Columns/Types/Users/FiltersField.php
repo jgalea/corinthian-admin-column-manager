@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Users;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Filterable behaviour for types that describe their filter in one array.
  *

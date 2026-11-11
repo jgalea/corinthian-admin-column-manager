@@ -2,6 +2,8 @@
 
 namespace Corinthian\Screens;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The media library in list mode. Attachments are posts, so sorting and post
  * column types work the same way as on other post screens.

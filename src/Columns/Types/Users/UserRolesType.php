@@ -7,6 +7,8 @@ use Corinthian\Columns\Editable;
 use Corinthian\Columns\Filterable;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 final class UserRolesType extends AbstractUserType implements Filterable, Editable {
 
 	use EditsUser;
@@ -57,7 +59,7 @@ final class UserRolesType extends AbstractUserType implements Filterable, Editab
 		if ( ! $likes ) {
 			return null;
 		}
-		$sub =  $wpdb->prepare( "SELECT 1 FROM {$wpdb->usermeta} {$alias} WHERE {$alias}.user_id = {$wpdb->users}.ID AND {$alias}.meta_key = %s", $wpdb->get_blog_prefix() . 'capabilities' ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$sub = $wpdb->prepare( "SELECT 1 FROM {$wpdb->usermeta} {$alias} WHERE {$alias}.user_id = {$wpdb->users}.ID AND {$alias}.meta_key = %s", $wpdb->get_blog_prefix() . 'capabilities' ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return array(
 			'join'  => '',
 			'where' => ( 'in' === $op ? 'EXISTS (' : 'NOT EXISTS (' ) . $sub . ' AND (' . implode( ' OR ', $likes ) . '))',

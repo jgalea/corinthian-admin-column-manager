@@ -8,6 +8,8 @@ use Corinthian\Columns\Sortable;
 use Corinthian\Sets\ColumnSet;
 use Corinthian\Sets\SetRepository;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * One admin list screen (posts of a type, users, media, comments, terms...).
  *
@@ -80,6 +82,11 @@ abstract class Screen {
 
 	/** Register the table hooks. Called on every admin request; keep it cheap. */
 	abstract public function register(): void;
+
+	/** User option WordPress stores this table's "Number of items per page" screen option in. */
+	public function per_page_option(): string {
+		return str_replace( '-', '_', $this->screen_id() ) . '_per_page';
+	}
 
 	/** Post type, taxonomy, etc. that the screen lists, when it has one. */
 	public function subtype(): string {
@@ -319,6 +326,9 @@ abstract class Screen {
 	 * @param array<string,string> $columns
 	 */
 	protected function remember_native( array $columns ): void {
+		if ( ! current_user_can( \Corinthian\Plugin::capability() ) ) {
+			return;
+		}
 		unset( $columns['cb'] );
 		$clean = array();
 		foreach ( $columns as $key => $label ) {

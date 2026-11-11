@@ -412,4 +412,77 @@ class MultisiteTest extends WP_UnitTestCase {
 		$entry = array_values( array_filter( $submenu['settings.php'], static fn( $e ) => 'corinthian' === $e[2] ) )[0];
 		$this->assertSame( 'manage_network_options', $entry[1] );
 	}
+
+	/**
+	 * @return array<string,mixed>|null
+	 */
+	private function rest_write( string $method, string $route, array $body ): ?array {
+		$request = new \WP_REST_Request( $method, $route );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body( (string) wp_json_encode( $body ) );
+		do_action( 'rest_api_init' );
+		$response = rest_get_server()->dispatch( $request );
+		return array(
+			'status' => $response->get_status(),
+			'data'   => $response->get_data(),
+		);
+	}
+
+	public function test_network_sets_need_manage_network_options_to_write(): void {
+		$payload = array(
+			'screen'  => 'network-users',
+			'title'   => 'Network',
+			'columns' => array(),
+		);
+
+		wp_set_current_user( $this->plain_admin );
+		$created = $this->rest_write( 'POST', '/corinthian/v1/sets', $payload );
+		$this->assertContains( $created['status'], array( 401, 403 ), 'a main-site admin cannot create a network set' );
+
+		wp_set_current_user( $this->super );
+		$created = $this->rest_write( 'POST', '/corinthian/v1/sets', $payload );
+		$this->assertSame( 201, $created['status'] );
+		$id = (int) $created['data']['id'];
+
+		wp_set_current_user( $this->plain_admin );
+		$updated = $this->rest_write( 'PUT', '/corinthian/v1/sets/' . $id, array( 'title' => 'Hijacked' ) );
+		$this->assertContains( $updated['status'], array( 401, 403 ) );
+		$deleted = $this->rest_write( 'DELETE', '/corinthian/v1/sets/' . $id, array() );
+		$this->assertContains( $deleted['status'], array( 401, 403 ) );
+		$this->assertSame( 'Network', $this->sets->find( $id )->title );
+
+		$site_set = $this->rest_write(
+			'POST',
+			'/corinthian/v1/sets',
+			array(
+				'screen'  => 'users',
+				'title'   => 'Site',
+				'columns' => array(),
+			)
+		);
+		$this->assertSame( 201, $site_set['status'], 'single site screens stay writable for site admins' );
+	}
+
+	public function test_super_admins_without_a_role_match_administrator_sets(): void {
+		$set   = new ColumnSet( id: 1, screen: 'users', title: 'Admins', columns: array(), settings: array( 'roles' => array( 'administrator' ) ) );
+		$plain = new \WP_User( self::factory()->user->create( array( 'role' => '' ) ) );
+		$this->assertFalse( $set->visible_to( $plain ), 'control: a roleless regular user does not match' );
+
+		grant_super_admin( $plain->ID );
+		$this->assertTrue( $set->visible_to( new \WP_User( $plain->ID ) ) );
+	}
+
+	public function test_the_import_screen_leaves_network_views_to_network_admins(): void {
+		update_option( 'cpac_options_wp-ms_users', array( 'user_login' => array( 'type' => 'column-user_login', 'label' => '' ) ) );
+		$importer = new \Corinthian\Import\AdminColumnsImporter( Plugin::instance() );
+
+		$report = $importer->run( true, array(), false );
+		$entry  = array_values( array_filter( $report, static fn( $e ) => 'option:cpac_options_wp-ms_users' === $e['source'] ) );
+		$this->assertCount( 1, $entry );
+		$this->assertSame( 'network admin only', $entry[0]['status'] );
+
+		$report = $importer->run( true, array(), true );
+		$entry  = array_values( array_filter( $report, static fn( $e ) => 'option:cpac_options_wp-ms_users' === $e['source'] ) );
+		$this->assertNotSame( 'network admin only', $entry[0]['status'] );
+	}
 }

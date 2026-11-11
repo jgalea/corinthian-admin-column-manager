@@ -7,6 +7,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The status flags on the blogs table: public, archived, spam, deleted, mature.
  */

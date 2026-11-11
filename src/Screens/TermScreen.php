@@ -7,6 +7,8 @@ use Corinthian\Sets\SetRepository;
 use WP_Taxonomy;
 use WP_Term_Query;
 
+defined( 'ABSPATH' ) || exit;
+
 final class TermScreen extends Screen {
 
 	public function __construct(

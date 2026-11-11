@@ -7,6 +7,8 @@ use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * A column that shows one derived value from the post, with no settings of its own.
  */

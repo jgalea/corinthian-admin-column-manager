@@ -69,6 +69,11 @@ JavaScript hooks (`wp.hooks`): the `corinthian.table.ready` action, and the `cor
 
 == Changelog ==
 
+= Unreleased =
+* Duplicating a column set to another screen leaves out formatting rules and shared segments that use columns the target screen doesn't have.
+* Meta keys on user columns are checked the way WordPress stores them (case, spaces and slashes), and only letters, numbers, dashes and underscores are editable.
+* A column set with a sticky header now keeps its header under the admin bar while the page scrolls, with no scroll box of its own inside the page.
+
 = 0.1.1 =
 * The Admin Columns importer skips columns a site no longer has, and creates no set when none are left.
 * Every column set keeps its screen's main column, so rows keep their link and row actions.

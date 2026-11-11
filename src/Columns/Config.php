@@ -2,6 +2,8 @@
 
 namespace Corinthian\Columns;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * One column as placed in a set: which type it is, plus the user's choices for it.
  *
@@ -34,7 +36,7 @@ final class Config {
 			id: sanitize_key( (string) ( $data['id'] ?? '' ) ),
 			type: sanitize_text_field( (string) ( $data['type'] ?? '' ) ),
 			label: sanitize_text_field( (string) ( $data['label'] ?? '' ) ),
-			width: $width ?: null,
+			width: $width > 0 ? $width : null,
 			width_unit: $unit,
 			settings: is_array( $data['settings'] ?? null ) ? $data['settings'] : array(),
 		);

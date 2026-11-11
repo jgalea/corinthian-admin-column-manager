@@ -6,6 +6,8 @@ use Closure;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Smart-filter operators and SQL shared by the post column types.
  */
@@ -71,7 +73,7 @@ final class PostFilter {
 					'revision'   => "{$alias}.post_type = 'revision'",
 					default      => "{$alias}.post_type NOT IN ('attachment','revision','nav_menu_item') AND {$alias}.post_status NOT IN ('trash','auto-draft')",
 				};
-				$expr  = "(SELECT COUNT(*) FROM {$wpdb->posts} AS {$alias} WHERE {$alias}.post_parent = {$wpdb->posts}.ID AND {$where})";
+				$expr = "(SELECT COUNT(*) FROM {$wpdb->posts} AS {$alias} WHERE {$alias}.post_parent = {$wpdb->posts}.ID AND {$where})";
 				return self::wrap( self::number_where( $expr, $op, $value ) );
 			}
 		);
@@ -126,9 +128,9 @@ final class PostFilter {
 					return null;
 				}
 				global $wpdb;
-				$parts  = array();
-				$named  = array_values( array_diff( $slugs, array( 'default' ) ) );
-				$base   = "SELECT 1 FROM {$wpdb->postmeta} AS {$alias} WHERE {$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = '_wp_page_template'";
+				$parts = array();
+				$named = array_values( array_diff( $slugs, array( 'default' ) ) );
+				$base  = "SELECT 1 FROM {$wpdb->postmeta} AS {$alias} WHERE {$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = '_wp_page_template'";
 				if ( $named ) {
 					$marks   = implode( ',', array_fill( 0, count( $named ), '%s' ) );
 					$parts[] = $wpdb->prepare( "EXISTS ({$base} AND {$alias}.meta_value IN ({$marks}))", $named ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
@@ -148,11 +150,31 @@ final class PostFilter {
 	public static function text_ops(): array {
 		return array_merge(
 			array(
-				array( 'op' => 'contains', 'label' => __( 'contains', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-				array( 'op' => 'not_contains', 'label' => __( 'does not contain', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-				array( 'op' => 'eq', 'label' => __( 'is', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-				array( 'op' => 'neq', 'label' => __( 'is not', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-				array( 'op' => 'starts', 'label' => __( 'starts with', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
+				array(
+					'op'    => 'contains',
+					'label' => __( 'contains', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
+				array(
+					'op'    => 'not_contains',
+					'label' => __( 'does not contain', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
+				array(
+					'op'    => 'eq',
+					'label' => __( 'is', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
+				array(
+					'op'    => 'neq',
+					'label' => __( 'is not', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
+				array(
+					'op'    => 'starts',
+					'label' => __( 'starts with', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
 			),
 			self::empty_ops()
 		);
@@ -163,14 +185,38 @@ final class PostFilter {
 	 */
 	public static function number_ops( bool $allow_empty ): array {
 		$ops = array(
-			array( 'op' => 'eq', 'label' => '=', 'input' => 'number' ),
-			array( 'op' => 'neq', 'label' => '≠', 'input' => 'number' ),
-			array( 'op' => 'gt', 'label' => '>', 'input' => 'number' ),
-			array( 'op' => 'lt', 'label' => '<', 'input' => 'number' ),
-			array( 'op' => 'between', 'label' => __( 'between', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
+			array(
+				'op'    => 'eq',
+				'label' => '=',
+				'input' => 'number',
+			),
+			array(
+				'op'    => 'neq',
+				'label' => '≠',
+				'input' => 'number',
+			),
+			array(
+				'op'    => 'gt',
+				'label' => '>',
+				'input' => 'number',
+			),
+			array(
+				'op'    => 'lt',
+				'label' => '<',
+				'input' => 'number',
+			),
+			array(
+				'op'    => 'between',
+				'label' => __( 'between', 'corinthian-admin-column-manager' ),
+				'input' => 'number',
+			),
 		);
 		if ( $allow_empty ) {
-			$ops[] = array( 'op' => 'empty', 'label' => __( 'is empty', 'corinthian-admin-column-manager' ), 'input' => 'none' );
+			$ops[] = array(
+				'op'    => 'empty',
+				'label' => __( 'is empty', 'corinthian-admin-column-manager' ),
+				'input' => 'none',
+			);
 		}
 		return $ops;
 	}
@@ -180,10 +226,26 @@ final class PostFilter {
 	 */
 	public static function date_ops(): array {
 		return array(
-			array( 'op' => 'before', 'label' => __( 'before', 'corinthian-admin-column-manager' ), 'input' => 'date' ),
-			array( 'op' => 'after', 'label' => __( 'after', 'corinthian-admin-column-manager' ), 'input' => 'date' ),
-			array( 'op' => 'within_days', 'label' => __( 'in the last (days)', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
-			array( 'op' => 'older_than_days', 'label' => __( 'older than (days)', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
+			array(
+				'op'    => 'before',
+				'label' => __( 'before', 'corinthian-admin-column-manager' ),
+				'input' => 'date',
+			),
+			array(
+				'op'    => 'after',
+				'label' => __( 'after', 'corinthian-admin-column-manager' ),
+				'input' => 'date',
+			),
+			array(
+				'op'    => 'within_days',
+				'label' => __( 'in the last (days)', 'corinthian-admin-column-manager' ),
+				'input' => 'number',
+			),
+			array(
+				'op'    => 'older_than_days',
+				'label' => __( 'older than (days)', 'corinthian-admin-column-manager' ),
+				'input' => 'number',
+			),
 		);
 	}
 
@@ -193,8 +255,18 @@ final class PostFilter {
 	 */
 	public static function in_ops( array $options, bool $with_empty = false ): array {
 		$ops = array(
-			array( 'op' => 'in', 'label' => __( 'is any of', 'corinthian-admin-column-manager' ), 'input' => 'select', 'options' => $options ),
-			array( 'op' => 'not_in', 'label' => __( 'is none of', 'corinthian-admin-column-manager' ), 'input' => 'select', 'options' => $options ),
+			array(
+				'op'      => 'in',
+				'label'   => __( 'is any of', 'corinthian-admin-column-manager' ),
+				'input'   => 'select',
+				'options' => $options,
+			),
+			array(
+				'op'      => 'not_in',
+				'label'   => __( 'is none of', 'corinthian-admin-column-manager' ),
+				'input'   => 'select',
+				'options' => $options,
+			),
 		);
 		return $with_empty ? array_merge( $ops, self::empty_ops() ) : $ops;
 	}
@@ -221,8 +293,16 @@ final class PostFilter {
 	 */
 	public static function empty_ops(): array {
 		return array(
-			array( 'op' => 'empty', 'label' => __( 'is empty', 'corinthian-admin-column-manager' ), 'input' => 'none' ),
-			array( 'op' => 'not_empty', 'label' => __( 'is not empty', 'corinthian-admin-column-manager' ), 'input' => 'none' ),
+			array(
+				'op'    => 'empty',
+				'label' => __( 'is empty', 'corinthian-admin-column-manager' ),
+				'input' => 'none',
+			),
+			array(
+				'op'    => 'not_empty',
+				'label' => __( 'is not empty', 'corinthian-admin-column-manager' ),
+				'input' => 'none',
+			),
 		);
 	}
 

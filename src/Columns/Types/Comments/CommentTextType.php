@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Comments;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Comment columns that are not sortable: author URL, reply-to, excerpt, word count, user agent.
  */

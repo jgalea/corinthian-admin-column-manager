@@ -4,6 +4,8 @@ namespace Corinthian\Columns;
 
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * A kind of column. One instance per type; per-column choices live in Config.
  *

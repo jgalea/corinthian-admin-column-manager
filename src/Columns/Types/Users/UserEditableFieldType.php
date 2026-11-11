@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Users;
 
 use Corinthian\Columns\Editable;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The user table columns that can be edited: display name, email and website.
  */

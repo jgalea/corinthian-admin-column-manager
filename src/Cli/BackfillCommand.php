@@ -5,6 +5,8 @@ namespace Corinthian\Cli;
 use Corinthian\Maintenance\WordCountBackfill;
 use WP_CLI;
 
+defined( 'ABSPATH' ) || exit;
+
 final class BackfillCommand {
 
 	/**

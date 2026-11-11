@@ -9,6 +9,8 @@ use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Text and number columns that live on the blogs table: id, domain and path.
  */

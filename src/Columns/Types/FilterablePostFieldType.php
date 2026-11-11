@@ -8,6 +8,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * A PostFieldType whose rules are compiled by a PostFilter.
  */

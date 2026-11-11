@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Implements Editable for a post column by handing the work to PostEditor.
  */

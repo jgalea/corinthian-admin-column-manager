@@ -6,6 +6,8 @@ use Corinthian\Plugin;
 use Corinthian\Screens\Screen;
 use Corinthian\Sets\SetRepository;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Everything Corinthian adds to the list table itself: column widths, the
  * horizontal-scroll guard that stops columns collapsing, and the set switcher.
@@ -27,10 +29,45 @@ final class TableUi {
 		if ( ! $screen ) {
 			return;
 		}
+		$this->apply_list_defaults( $screen );
 		add_action( 'admin_head', fn() => $this->print_styles( $screen ) );
 		add_action( 'admin_enqueue_scripts', fn() => $this->enqueue( $screen ) );
 		// Not every list table has a tablenav hook, so print in the footer and move it.
 		add_action( 'admin_footer', fn() => $this->print_switcher( $screen ) );
+	}
+
+	private function apply_list_defaults( Screen $screen ): void {
+		$set = $screen->active_set();
+		if ( ! $set ) {
+			return;
+		}
+
+		$per_page = (int) ( $set->settings['per_page'] ?? 0 );
+		$option   = $screen->per_page_option();
+		if ( $per_page > 0 ) {
+			add_filter(
+				$option,
+				static function ( $current ) use ( $per_page, $option ) {
+					// A number the user picked in Screen Options wins over the set's.
+					return (int) get_user_option( $option ) > 0 ? $current : min( $per_page, 999 );
+				}
+			);
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only list state.
+		$by = sanitize_text_field( (string) ( $set->settings['default_orderby'] ?? '' ) );
+		if ( '' === $by || ! empty( $_GET['orderby'] ) || ! empty( $_GET['s'] ) || 'GET' !== ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) {
+			return;
+		}
+		if ( str_starts_with( $by, 'corinthian-' ) && ! $screen->sort_target( $by ) ) {
+			return;
+		}
+		$order = 'desc' === strtolower( (string) ( $set->settings['default_order'] ?? '' ) ) ? 'desc' : 'asc';
+		// phpcs:enable
+		$_GET['orderby']     = $by;
+		$_GET['order']       = $order;
+		$_REQUEST['orderby'] = $by;
+		$_REQUEST['order']   = $order;
 	}
 
 	public function print_styles( Screen $screen ): void {
@@ -59,22 +96,29 @@ final class TableUi {
 
 		// WordPress uses a fixed table layout: once sized columns take the full
 		// width, unsized ones collapse to nothing. A minimum table width plus a
-		// scrolling wrapper keeps every column readable.
-		$rules[]  = '.corinthian-scroll{overflow-x:auto}';
-		$all_mine = array() !== $mine && array() === array_diff( array_map( static fn( $c ) => $c->table_key(), $set->columns ), array_keys( $mine ) );
-		if ( $all_mine ) {
-			// The user sized every column by dragging: the table is exactly their sum.
-			$rules[] = '.corinthian-scroll>.wp-list-table{width:' . (int) $min_total . 'px;min-width:0}';
-		} else {
-			$rules[] = '.corinthian-scroll>.wp-list-table{min-width:' . (int) $min_total . 'px}';
+		// scrolling wrapper keeps every column readable, unless the set fits the page instead.
+		$fit    = ! empty( $set->settings['fit_width'] );
+		$sticky = ! empty( $set->settings['sticky_header'] );
+		if ( ! $fit ) {
+			$all_mine = array() !== $mine && array() === array_diff( array_map( static fn( $c ) => $c->table_key(), $set->columns ), array_keys( $mine ) );
+			if ( $all_mine ) {
+				// The user sized every column by dragging: the table is exactly their sum.
+				$rules[] = '.corinthian-scroll>.wp-list-table{width:' . (int) $min_total . 'px;min-width:0}';
+			} else {
+				$rules[] = '.corinthian-scroll>.wp-list-table{min-width:' . (int) $min_total . 'px}';
+			}
+			// A sticky header sticks to the page scroll, so its wrapper can't be a scroll container of its own.
+			$rules[] = $sticky ? '.corinthian-scroll{overflow:visible}' : '.corinthian-scroll{overflow-x:auto}';
 		}
-		if ( ! empty( $set->settings['sticky_header'] ) ) {
-			$rules[] = '.wp-list-table thead th,.wp-list-table thead td{position:sticky;top:32px;z-index:2;background:#fff}';
-			$rules[] = '.corinthian-scroll{overflow-x:visible}';
+		if ( $sticky ) {
+			$rules[] = '.wp-list-table thead th.manage-column,.wp-list-table thead td.manage-column{position:sticky;inset-block-start:var(--wp-admin--admin-bar--height,32px);z-index:2;background:#fff}';
 		}
 		$rules[] = '.corinthian-switcher{display:inline-flex;gap:6px;align-items:center;margin:0 8px 0 0}';
 
 		echo '<style id="corinthian-table">' . implode( '', $rules ) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built from integers and sanitized class names.
+		if ( $fit ) {
+			return;
+		}
 		?>
 		<script>
 		document.addEventListener('DOMContentLoaded',function(){var t=document.querySelector('table.wp-list-table');if(t&&!t.parentNode.classList.contains('corinthian-scroll')){var w=document.createElement('div');w.className='corinthian-scroll';t.parentNode.insertBefore(w,t);w.appendChild(t);}});

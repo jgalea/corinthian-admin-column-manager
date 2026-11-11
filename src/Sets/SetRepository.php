@@ -2,9 +2,12 @@
 
 namespace Corinthian\Sets;
 
+use Corinthian\Admin\TableUi;
 use Corinthian\Columns\Config;
 use Corinthian\Schema;
 use Corinthian\Screens\Screen;
+
+defined( 'ABSPATH' ) || exit;
 
 final class SetRepository {
 
@@ -27,7 +30,7 @@ final class SetRepository {
 
 		$sets = array_merge(
 			array_values( array_filter( CodeSets::all(), static fn( ColumnSet $s ) => $s->screen === $screen ) ),
-			array_map( array( $this, 'hydrate' ), $rows ?: array() )
+			array_map( array( $this, 'hydrate' ), $rows ?? array() )
 		);
 		usort( $sets, static fn( ColumnSet $a, ColumnSet $b ) => array( $a->position, $a->id ) <=> array( $b->position, $b->id ) );
 
@@ -43,7 +46,25 @@ final class SetRepository {
 		$table = Schema::table();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table name from $wpdb->prefix.
 		$rows = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY screen ASC, position ASC, id ASC", ARRAY_A );
-		return array_merge( CodeSets::all(), array_map( array( $this, 'hydrate' ), $rows ?: array() ) );
+		return array_merge( CodeSets::all(), array_map( array( $this, 'hydrate' ), $rows ?? array() ) );
+	}
+
+	/**
+	 * Whether any saved set has a column of one of these types.
+	 *
+	 * @param list<string> $types
+	 */
+	public function stored_uses_type( array $types ): bool {
+		global $wpdb;
+		$table = Schema::table();
+		$likes = array_map( static fn( string $type ) => '%' . $wpdb->esc_like( '"type":"' . $type . '"' ) . '%', $types );
+		$where = implode( ' OR ', array_fill( 0, count( $likes ), 'columns LIKE %s' ) );
+		// A site that switched in from the network may not have the table yet.
+		$quiet = $wpdb->suppress_errors( true );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table name; the placeholders are generated from the count of $types.
+		$found = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE {$where} LIMIT 1", $likes ) );
+		$wpdb->suppress_errors( $quiet );
+		return null !== $found;
 	}
 
 	public function find( int $id ): ?ColumnSet {
@@ -132,6 +153,10 @@ final class SetRepository {
 		if ( ! $set ) {
 			throw new \RuntimeException( 'Column set could not be saved.' );
 		}
+		/**
+		 * Fires after a column set is saved.
+		 */
+		do_action( 'corinthian_set_saved', $set );
 		return $set;
 	}
 
@@ -140,9 +165,19 @@ final class SetRepository {
 			return false;
 		}
 		global $wpdb;
+		$set         = $this->find( $id );
 		$this->cache = array();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return (bool) $wpdb->delete( Schema::table(), array( 'id' => $id ) );
+		$deleted = (bool) $wpdb->delete( Schema::table(), array( 'id' => $id ) );
+		if ( $deleted && $set ) {
+			delete_metadata( 'user', 0, TableUi::widths_meta_key( $set->screen, $id ), '', true );
+			delete_metadata( 'user', 0, self::active_meta_key( $set->screen ), $id, true );
+			/**
+			 * Fires after a column set is deleted, so add-ons can drop data stored per set.
+			 */
+			do_action( 'corinthian_set_deleted', $id, $set->screen );
+		}
+		return $deleted;
 	}
 
 	/**
@@ -152,12 +187,22 @@ final class SetRepository {
 	private static function clean_settings( array $settings ): array {
 		$roles = array_values( array_filter( array_map( 'sanitize_key', (array) ( $settings['roles'] ?? array() ) ) ) );
 		$users = array_values( array_filter( array_map( 'absint', (array) ( $settings['users'] ?? array() ) ) ) );
-		return array(
+		$own   = array(
 			'roles'             => $roles,
 			'users'             => $users,
 			'horizontal_scroll' => ! empty( $settings['horizontal_scroll'] ),
 			'sticky_header'     => ! empty( $settings['sticky_header'] ),
-		) + array_diff_key( $settings, array_flip( array( 'roles', 'users', 'horizontal_scroll', 'sticky_header' ) ) );
+		);
+		if ( absint( $settings['per_page'] ?? 0 ) > 0 ) {
+			$own['per_page'] = min( 999, absint( $settings['per_page'] ) );
+		}
+		$by = sanitize_key( (string) ( $settings['default_orderby'] ?? '' ) );
+		if ( '' !== $by ) {
+			$own['default_orderby'] = $by;
+			$own['default_order']   = 'desc' === strtolower( (string) ( $settings['default_order'] ?? '' ) ) ? 'desc' : 'asc';
+		}
+		$handled = array( 'roles', 'users', 'horizontal_scroll', 'sticky_header', 'per_page', 'default_orderby', 'default_order' );
+		return $own + array_diff_key( $settings, array_flip( $handled ) );
 	}
 
 	/**

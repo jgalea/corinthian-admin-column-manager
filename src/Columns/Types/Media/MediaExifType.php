@@ -6,6 +6,8 @@ use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 use DateTimeZone;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * One field of the EXIF data WordPress keeps in image_meta.
  */

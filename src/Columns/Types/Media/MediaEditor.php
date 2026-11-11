@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Media;
 use WP_Error;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Validation and storage for editing media columns, through wp_update_post and post meta.
  */

@@ -9,6 +9,8 @@ use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Registered and last updated, both stored in UTC on the blogs table.
  */

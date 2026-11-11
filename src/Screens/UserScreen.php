@@ -4,6 +4,8 @@ namespace Corinthian\Screens;
 
 use WP_User_Query;
 
+defined( 'ABSPATH' ) || exit;
+
 class UserScreen extends Screen {
 
 	public function key(): string {

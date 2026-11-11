@@ -4,6 +4,8 @@ namespace Corinthian\Columns;
 
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * A column whose value can be changed from the list table, one row at a time
  * (inline) or across many rows (bulk).

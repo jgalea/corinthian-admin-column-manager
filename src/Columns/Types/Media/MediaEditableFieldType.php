@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Media;
 
 use Corinthian\Columns\Editable;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The attachment columns that can be edited: alt text and the parent post.
  */

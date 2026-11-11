@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Comments;
 use Corinthian\Columns\Types\Users\AbstractMetaType;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 final class CommentMetaType extends AbstractMetaType {
 
 	protected function prefix(): string {

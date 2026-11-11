@@ -37,6 +37,8 @@ use Corinthian\Columns\Types\Users\UserPostCountType;
 use Corinthian\Columns\Types\Users\UserProfileType;
 use Corinthian\Columns\Types\Users\UserRolesType;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Column types for the users, media, comments and taxonomy term screens.
  */

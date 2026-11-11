@@ -7,6 +7,8 @@ use Corinthian\Columns\Editable;
 use Corinthian\Screens\Screen;
 use Corinthian\Columns\Filterable;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Profile fields stored as user meta: names, biography and editing preferences.
  */

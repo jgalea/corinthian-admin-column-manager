@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Comments;
 
 use Corinthian\Columns\Editable;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The comment table columns that can be edited: author name, author email and status.
  */

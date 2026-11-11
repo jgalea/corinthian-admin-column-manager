@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Users;
 
 use WP_Error;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Validation and storage for editing one meta key on a user, comment or term.
  * Every write checks the meta capability for the exact change.
@@ -41,6 +43,11 @@ final class MetaEditor {
 		}
 		if ( ! in_array( $mode, array( 'set', 'clear' ), true ) ) {
 			return new WP_Error( 'corinthian_bad_mode', __( 'This column does not support that edit.', 'corinthian-admin-column-manager' ) );
+		}
+		// The metadata API unslashes and compares keys loosely, so check the key the way storage will see it.
+		$key = trim( wp_unslash( $key ) );
+		if ( 'user' === $type && ! preg_match( '/^[A-Za-z0-9_\-]+$/', $key ) ) {
+			return new WP_Error( 'corinthian_protected', __( 'You cannot change this field.', 'corinthian-admin-column-manager' ) );
 		}
 		if ( self::is_reserved( $type, $key ) ) {
 			return new WP_Error( 'corinthian_protected', __( 'You cannot change this field.', 'corinthian-admin-column-manager' ) );
@@ -104,9 +111,13 @@ final class MetaEditor {
 		if ( 'user' !== $type ) {
 			return false;
 		}
+		$key = strtolower( trim( $key ) );
+		if ( in_array( $key, array( 'session_tokens', 'default_password_nag', 'use_ssl', 'show_admin_bar_front', 'dismissed_wp_pointers', 'community-events-location' ), true ) ) {
+			return true;
+		}
 		global $wpdb;
 		foreach ( array( $wpdb->base_prefix, $wpdb->prefix, $wpdb->get_blog_prefix() ) as $prefix ) {
-			if ( '' !== $prefix && str_starts_with( $key, $prefix ) ) {
+			if ( '' !== $prefix && str_starts_with( $key, strtolower( $prefix ) ) ) {
 				return true;
 			}
 		}

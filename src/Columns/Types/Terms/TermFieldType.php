@@ -9,6 +9,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Term columns that sort in SQL. The terms screen aliases the tables as t and tt.
  */

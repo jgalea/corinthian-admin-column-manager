@@ -8,6 +8,8 @@ use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 class DateType extends AbstractPostType implements Sortable, Filterable {
 
 	/**

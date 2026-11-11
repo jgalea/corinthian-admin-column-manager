@@ -9,6 +9,8 @@ use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 final class TermDescriptionFilterType extends TermTextType implements Filterable, Editable {
 
 	use EditsTerm;

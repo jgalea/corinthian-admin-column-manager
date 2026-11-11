@@ -8,6 +8,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ExcerptType extends AbstractPostType implements Filterable, Editable {
 
 	use EditsPost;

@@ -8,6 +8,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Any meta key on a user, comment or term, shown like the post custom field column.
  */

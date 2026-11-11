@@ -6,6 +6,8 @@ use Corinthian\Columns\Types\Users\ScreenFieldType;
 use Corinthian\Screens\Screen;
 use WP_Comment;
 
+defined( 'ABSPATH' ) || exit;
+
 abstract class AbstractCommentType extends ScreenFieldType {
 
 	protected function prefix(): string {

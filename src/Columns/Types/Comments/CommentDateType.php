@@ -9,6 +9,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 
+defined( 'ABSPATH' ) || exit;
+
 final class CommentDateType extends AbstractCommentType implements Sortable, Filterable {
 
 	use FiltersField;

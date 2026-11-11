@@ -7,6 +7,8 @@ use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 abstract class AbstractPostType extends AbstractType {
 
 	public function supports( Screen $screen ): bool {

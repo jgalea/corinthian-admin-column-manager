@@ -7,6 +7,8 @@ use Corinthian\Sets\SetRepository;
 use WP_Post_Type;
 use WP_Query;
 
+defined( 'ABSPATH' ) || exit;
+
 class PostTypeScreen extends Screen {
 
 	public function __construct(

@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types;
 
 use Corinthian\Columns\Registry;
 
+defined( 'ABSPATH' ) || exit;
+
 final class TypeLoader {
 
 	public static function register( Registry $registry ): void {

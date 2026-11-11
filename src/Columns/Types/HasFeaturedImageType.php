@@ -8,6 +8,8 @@ use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 final class HasFeaturedImageType extends AbstractPostType implements Sortable, Filterable {
 
 	public function key(): string {

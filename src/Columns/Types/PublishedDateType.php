@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types;
 
 use Corinthian\Columns\Editable;
 
+defined( 'ABSPATH' ) || exit;
+
 final class PublishedDateType extends DateType implements Editable {
 
 	use EditsPost;

@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Sites;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Read-only options of a site: language and admin email.
  */

@@ -7,6 +7,8 @@ use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 use Corinthian\Columns\Filterable;
 
+defined( 'ABSPATH' ) || exit;
+
 final class UserCommentCountType extends AbstractUserType implements Sortable, Filterable {
 
 	use FiltersField;

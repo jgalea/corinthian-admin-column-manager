@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Terms;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Implements Editable for a term column by handing the work to TermEditor.
  */

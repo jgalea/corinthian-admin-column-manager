@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Media;
 use Corinthian\Columns\Types\Users\ScreenFieldType;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 abstract class AbstractMediaType extends ScreenFieldType {
 
 	protected function prefix(): string {

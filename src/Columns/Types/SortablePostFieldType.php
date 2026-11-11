@@ -9,6 +9,8 @@ use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * A PostFieldType that sorts by one column of the posts table.
  */

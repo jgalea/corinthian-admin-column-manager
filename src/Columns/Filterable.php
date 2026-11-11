@@ -4,6 +4,8 @@ namespace Corinthian\Columns;
 
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * A column that can narrow the list with smart-filter rules.
  *

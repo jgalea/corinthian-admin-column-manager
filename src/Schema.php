@@ -2,9 +2,11 @@
 
 namespace Corinthian;
 
+defined( 'ABSPATH' ) || exit;
+
 final class Schema {
 
-	public const DB_VERSION = '1';
+	public const DB_VERSION = '2';
 	public const OPTION     = 'corinthian_db_version';
 
 	public static function table(): string {
@@ -34,7 +36,7 @@ final class Schema {
 			) {$charset};"
 		);
 
-		update_option( self::OPTION, self::DB_VERSION, false );
+		update_option( self::OPTION, self::DB_VERSION, true );
 	}
 
 	public static function maybe_upgrade(): void {

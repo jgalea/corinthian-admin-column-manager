@@ -5,6 +5,8 @@ namespace Corinthian\Import;
 use Corinthian\Plugin;
 use Corinthian\Sets\ColumnSet;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Imports column views saved by the Admin Columns plugin (free or Pro), so a
  * site can switch to Corinthian without rebuilding its views by hand.
@@ -66,7 +68,7 @@ final class AdminColumnsImporter {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- $table is our source plugin's table name built from $wpdb->prefix; identifiers can't be bound.
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table ) {
 			$rows = $wpdb->get_results( "SELECT id, list_key, title, columns, settings FROM {$table} ORDER BY id ASC", ARRAY_A );
-			foreach ( $rows ?: array() as $row ) {
+			foreach ( $rows ?? array() as $row ) {
 				$views[] = array(
 					'source'   => 'table:' . $row['id'],
 					'list_key' => (string) $row['list_key'],
@@ -79,7 +81,7 @@ final class AdminColumnsImporter {
 
 		$options = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE 'cpac\\_options\\_%' AND option_name NOT LIKE '%\\_\\_default'", ARRAY_A );
 		// phpcs:enable
-		foreach ( $options ?: array() as $option ) {
+		foreach ( $options ?? array() as $option ) {
 			$columns = self::decode( (string) $option['option_value'] );
 			if ( ! $columns ) {
 				continue;
@@ -99,9 +101,10 @@ final class AdminColumnsImporter {
 	/**
 	 * @param bool         $dry_run    Report what would happen without saving.
 	 * @param list<string> $also_roles Roles that should also see views limited to specific users or roles.
+	 * @param bool         $network    Whether views for the network admin screens may be imported.
 	 * @return list<array{source:string,screen:string,status:string,set_id:int,imported:list<string>,skipped:list<string>}>
 	 */
-	public function run( bool $dry_run = false, array $also_roles = array() ): array {
+	public function run( bool $dry_run = false, array $also_roles = array(), bool $network = true ): array {
 		$report   = array();
 		$existing = array();
 		foreach ( $this->plugin->sets->all() as $set ) {
@@ -121,6 +124,11 @@ final class AdminColumnsImporter {
 				'imported' => array(),
 				'skipped'  => array(),
 			);
+			if ( null !== $screen && ! $network && str_starts_with( $screen, 'network-' ) ) {
+				$entry['status'] = 'network admin only';
+				$report[]        = $entry;
+				continue;
+			}
 			if ( null === $screen ) {
 				$entry['status'] = 'unsupported screen';
 				$report[]        = $entry;

@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Sites;
 
 use Corinthian\Columns\Registry;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Column types for the network admin sites screen.
  */

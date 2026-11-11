@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Comments;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Implements Editable for a comment column by handing the work to CommentEditor.
  */

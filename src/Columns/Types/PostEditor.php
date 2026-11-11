@@ -6,6 +6,8 @@ use Corinthian\Screens\Screen;
 use WP_Error;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Validation and storage for editing post columns. Every write goes through
  * core APIs so hooks and revisions fire, and checks the capability the change needs.
@@ -127,7 +129,12 @@ final class PostEditor {
 				if ( '' !== $slug ) {
 					$slug = wp_unique_post_slug( $slug, $id, $post->post_status, $post->post_type, (int) $post->post_parent );
 				}
-				return self::update( array( 'ID' => $id, 'post_name' => $slug ) );
+				return self::update(
+					array(
+						'ID'        => $id,
+						'post_name' => $slug,
+					)
+				);
 
 			case 'excerpt':
 				if ( ! post_type_supports( $post->post_type, 'excerpt' ) ) {
@@ -137,7 +144,12 @@ final class PostEditor {
 				if ( ! current_user_can( 'unfiltered_html' ) ) {
 					$excerpt = wp_kses_post( $excerpt );
 				}
-				return self::update( array( 'ID' => $id, 'post_excerpt' => $excerpt ) );
+				return self::update(
+					array(
+						'ID'           => $id,
+						'post_excerpt' => $excerpt,
+					)
+				);
 
 			case 'status':
 				return self::save_status( $post, $type, sanitize_key( $text ) );
@@ -153,7 +165,12 @@ final class PostEditor {
 				if ( ! $author || ! get_userdata( $author ) || ! user_can( $author, $type->cap->edit_posts ) ) {
 					return new WP_Error( 'corinthian_invalid', __( 'Choose a user who can edit this content type.', 'corinthian-admin-column-manager' ) );
 				}
-				return self::update( array( 'ID' => $id, 'post_author' => $author ) );
+				return self::update(
+					array(
+						'ID'          => $id,
+						'post_author' => $author,
+					)
+				);
 
 			case 'date':
 				return self::save_date( $post, $text );
@@ -165,7 +182,12 @@ final class PostEditor {
 					return new WP_Error( 'corinthian_unsupported', __( 'This content type does not support that setting.', 'corinthian-admin-column-manager' ) );
 				}
 				$on = ! $clear && self::truthy( $value );
-				return self::update( array( 'ID' => $id, $kind => $on ? 'open' : 'closed' ) );
+				return self::update(
+					array(
+						'ID'  => $id,
+						$kind => $on ? 'open' : 'closed',
+					)
+				);
 
 			case 'sticky':
 				if ( 'post' !== $post->post_type ) {
@@ -191,7 +213,12 @@ final class PostEditor {
 				if ( ! $clear && ! preg_match( '/^-?\d{1,9}$/', $text ) ) {
 					return new WP_Error( 'corinthian_invalid', __( 'Enter a whole number.', 'corinthian-admin-column-manager' ) );
 				}
-				return self::update( array( 'ID' => $id, 'menu_order' => $clear ? 0 : (int) $text ) );
+				return self::update(
+					array(
+						'ID'         => $id,
+						'menu_order' => $clear ? 0 : (int) $text,
+					)
+				);
 
 			case 'template':
 				$templates = wp_get_theme()->get_page_templates( $post, $post->post_type );
@@ -199,7 +226,12 @@ final class PostEditor {
 				if ( 'default' !== $chosen && ! isset( $templates[ $chosen ] ) ) {
 					return new WP_Error( 'corinthian_invalid', __( 'That template is not available.', 'corinthian-admin-column-manager' ) );
 				}
-				return self::update( array( 'ID' => $id, 'page_template' => $chosen ) );
+				return self::update(
+					array(
+						'ID'            => $id,
+						'page_template' => $chosen,
+					)
+				);
 
 			case 'format':
 				if ( ! post_type_supports( $post->post_type, 'post-formats' ) ) {
@@ -244,7 +276,12 @@ final class PostEditor {
 				return new WP_Error( 'corinthian_invalid', __( 'Set a future publish date before scheduling.', 'corinthian-admin-column-manager' ) );
 			}
 		}
-		return self::update( array( 'ID' => $post->ID, 'post_status' => $status ) );
+		return self::update(
+			array(
+				'ID'          => $post->ID,
+				'post_status' => $status,
+			)
+		);
 	}
 
 	/**
@@ -313,7 +350,12 @@ final class PostEditor {
 				return new WP_Error( 'corinthian_invalid', __( 'An item cannot be its own parent or a child of its own descendant.', 'corinthian-admin-column-manager' ) );
 			}
 		}
-		return self::update( array( 'ID' => $post->ID, 'post_parent' => $parent ) );
+		return self::update(
+			array(
+				'ID'          => $post->ID,
+				'post_parent' => $parent,
+			)
+		);
 	}
 
 	/**
@@ -481,7 +523,7 @@ final class PostEditor {
 				'fields'     => 'id=>name',
 			)
 		);
-		$out = array();
+		$out   = array();
 		foreach ( is_array( $terms ) ? $terms : array() as $id => $name ) {
 			$out[ (string) $id ] = (string) $name;
 		}

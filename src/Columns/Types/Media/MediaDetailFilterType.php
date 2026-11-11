@@ -8,6 +8,8 @@ use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The attachment detail columns that can be filtered: caption, description and featured image use.
  */

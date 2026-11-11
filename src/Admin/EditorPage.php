@@ -5,6 +5,8 @@ namespace Corinthian\Admin;
 use Corinthian\Plugin;
 use Corinthian\Rest\SetsController;
 
+defined( 'ABSPATH' ) || exit;
+
 final class EditorPage {
 
 	public const SLUG = 'corinthian';
@@ -94,6 +96,9 @@ final class EditorPage {
 
 	public function render(): void {
 		echo '<div class="wrap"><h1>' . esc_html__( 'Columns', 'corinthian-admin-column-manager' ) . '</h1>';
+		if ( ImportPage::available() ) {
+			echo '<p><a href="' . esc_url( ImportPage::url() ) . '">' . esc_html__( 'Import your Admin Columns views', 'corinthian-admin-column-manager' ) . '</a></p>';
+		}
 		if ( ! file_exists( CORINTHIAN_DIR . 'assets/build/editor.asset.php' ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Corinthian: run `npm run build` to build the column editor.', 'corinthian-admin-column-manager' ) . '</p></div>';
 		}

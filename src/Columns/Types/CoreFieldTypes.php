@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types;
 use Corinthian\Columns\ColumnType;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Post columns that need no settings of their own.
  */
