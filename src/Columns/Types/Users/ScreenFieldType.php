@@ -7,6 +7,8 @@ use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 use DateTimeZone;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Shared base for the user, media, comment and term column types.
  */

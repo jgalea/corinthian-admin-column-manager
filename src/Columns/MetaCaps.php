@@ -2,6 +2,8 @@
 
 namespace Corinthian\Columns;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Meta capability checks for field plugins that write through their own API.
  *

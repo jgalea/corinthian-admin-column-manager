@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Users;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 final class UserCapabilitiesType extends AbstractUserType {
 
 	public function __construct() {

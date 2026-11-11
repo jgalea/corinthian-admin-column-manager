@@ -6,6 +6,8 @@ use Corinthian\Columns\Types\Users\ScreenFieldType;
 use Corinthian\Screens\Screen;
 use WP_Term;
 
+defined( 'ABSPATH' ) || exit;
+
 abstract class AbstractTermType extends ScreenFieldType {
 
 	protected function prefix(): string {

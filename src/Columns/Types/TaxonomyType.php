@@ -10,6 +10,8 @@ use Corinthian\Screens\Screen;
 use WP_Post;
 use WP_Term;
 
+defined( 'ABSPATH' ) || exit;
+
 final class TaxonomyType extends AbstractPostType implements Sortable, Filterable, Editable {
 
 	use EditsPost;

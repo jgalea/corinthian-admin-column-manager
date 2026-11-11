@@ -5,6 +5,8 @@ namespace Corinthian\Screens;
 use Closure;
 use WP_Site_Query;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Runs WP_Site_Query without its result cache.
  *

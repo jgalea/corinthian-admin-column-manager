@@ -7,6 +7,8 @@ use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 use Corinthian\Columns\Filterable;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Columns that live on the users table.
  */

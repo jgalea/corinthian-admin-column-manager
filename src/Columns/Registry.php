@@ -4,6 +4,8 @@ namespace Corinthian\Columns;
 
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 final class Registry {
 
 	/** @var array<string,ColumnType> */

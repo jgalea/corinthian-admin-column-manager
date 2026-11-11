@@ -2,6 +2,8 @@
 
 namespace Corinthian\Sets;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Column sets defined in PHP with corinthian_register_set(). They're read-only
  * in the admin and live in version control instead of the database.
@@ -35,6 +37,20 @@ final class CodeSets {
 	}
 
 	/**
+	 * @param list<string> $types
+	 */
+	public static function uses_type( array $types ): bool {
+		foreach ( self::all() as $set ) {
+			foreach ( $set->columns as $config ) {
+				if ( in_array( $config->type, $types, true ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * @return list<ColumnSet>
 	 */
 	public static function all(): array {
@@ -52,7 +68,10 @@ final class CodeSets {
 				screen: (string) $data['screen'],
 				title: (string) ( $data['title'] ?? $key ),
 				columns: $columns,
-				settings: array( 'readonly' => true, 'code_key' => $key ) + (array) ( $data['settings'] ?? array() ),
+				settings: array(
+					'readonly' => true,
+					'code_key' => $key,
+				) + (array) ( $data['settings'] ?? array() ),
 				position: (int) ( $data['position'] ?? -100 ),
 			);
 		}

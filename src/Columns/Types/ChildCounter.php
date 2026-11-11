@@ -2,6 +2,8 @@
 
 namespace Corinthian\Columns\Types;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Counts related posts for every row on the current list page with one query.
  */

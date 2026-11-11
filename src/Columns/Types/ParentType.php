@@ -9,6 +9,8 @@ use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ParentType extends AbstractPostType implements Sortable, Filterable, Editable {
 
 	use EditsPost;
@@ -50,8 +52,16 @@ final class ParentType extends AbstractPostType implements Sortable, Filterable,
 
 	public function filter_operators( Config $config, Screen $screen ): array {
 		return array(
-			array( 'op' => 'eq', 'label' => __( 'is', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
-			array( 'op' => 'empty', 'label' => __( 'is top level', 'corinthian-admin-column-manager' ), 'input' => 'none' ),
+			array(
+				'op'    => 'eq',
+				'label' => __( 'is', 'corinthian-admin-column-manager' ),
+				'input' => 'number',
+			),
+			array(
+				'op'    => 'empty',
+				'label' => __( 'is top level', 'corinthian-admin-column-manager' ),
+				'input' => 'none',
+			),
 		);
 	}
 

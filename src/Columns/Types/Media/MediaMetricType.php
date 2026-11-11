@@ -9,6 +9,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * File size, width and height, sorted through the cached post meta in MediaMeta.
  */

@@ -6,6 +6,8 @@ use Corinthian\Columns\AbstractType;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * A column WordPress or another plugin registers. Corinthian only places and
  * labels it; the original code renders it and handles its sorting.

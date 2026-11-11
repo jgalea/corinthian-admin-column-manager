@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Terms;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Term columns that are not sortable: description, link and depth.
  */

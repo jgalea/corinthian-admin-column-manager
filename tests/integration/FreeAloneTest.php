@@ -190,4 +190,53 @@ class FreeAloneTest extends WP_UnitTestCase {
 		$this->assertNull( $screen->sort_target( 'corinthian-c2' ) );
 		$this->assertArrayNotHasKey( 'corinthian-c2', $screen->filter_sortable( array() ) );
 	}
+
+	public function test_widths_are_refused_on_screens_the_user_cannot_list(): void {
+		$set = $this->plugin->sets->save( $this->proish_set( 'users' ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+
+		$request = new WP_REST_Request( 'POST', '/corinthian/v1/widths' );
+		$request->set_param( 'screen', 'users' );
+		$request->set_param( 'set', $set->id );
+		$request->set_param( 'widths', array( 'corinthian-c1' => 300 ) );
+		$response = ( new \Corinthian\Rest\WidthsController( $this->plugin ) )->save( $request );
+
+		$this->assertWPError( $response );
+		$this->assertSame( '', get_user_meta( get_current_user_id(), \Corinthian\Admin\TableUi::widths_meta_key( 'users', $set->id ), true ) );
+	}
+
+	public function test_word_counts_are_stored_only_when_a_set_uses_them(): void {
+		$before = self::factory()->post->create();
+		$this->assertSame( '', get_post_meta( $before, \Corinthian\Columns\Types\WordCountMeta::KEY, true ), 'no set uses word counts yet' );
+
+		$this->plugin->sets->save(
+			array(
+				'screen'  => 'post:post',
+				'title'   => 'Counts',
+				'columns' => array(
+					array(
+						'id'   => 'wc',
+						'type' => 'post.word_count',
+					),
+				),
+			)
+		);
+		$after = self::factory()->post->create( array( 'post_content' => 'one two three' ) );
+
+		$this->assertSame( '3', get_post_meta( $after, \Corinthian\Columns\Types\WordCountMeta::KEY, true ) );
+		$this->assertFalse( get_option( \Corinthian\Maintenance\WordCountBackfill::OPTION ) );
+	}
+
+	public function test_editors_do_not_overwrite_the_remembered_native_columns(): void {
+		$key = \Corinthian\Screens\Screen::NATIVE_OPTION_PREFIX . md5( 'post:post' );
+		$screen = $this->fresh_screens()['post:post'];
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		$screen->filter_columns( array( 'title' => 'Title' ) );
+		$this->assertFalse( get_option( $key ), 'an editor view is not recorded' );
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$screen->filter_columns( array( 'title' => 'Title', 'seo' => 'SEO' ) );
+		$this->assertSame( array( 'title' => 'Title', 'seo' => 'SEO' ), get_option( $key ) );
+	}
 }

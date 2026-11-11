@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Terms;
 
 use Corinthian\Columns\Editable;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The term columns that can be edited: name, slug and parent.
  */

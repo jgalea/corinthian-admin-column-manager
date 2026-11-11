@@ -9,6 +9,8 @@ use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Screens\Screen;
 use WP_Error;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The blogname option. It lives in each site's own options table, so the
  * filter joins a UNION of those tables, limited to the first SITE_CAP sites.

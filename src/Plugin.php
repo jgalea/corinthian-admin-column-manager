@@ -10,6 +10,8 @@ use Corinthian\Rest\SetsController;
 use Corinthian\Screens\ScreenRegistry;
 use Corinthian\Sets\SetRepository;
 
+defined( 'ABSPATH' ) || exit;
+
 final class Plugin {
 
 	private static ?self $instance = null;
@@ -70,6 +72,7 @@ final class Plugin {
 
 		if ( is_admin() ) {
 			( new EditorPage() )->register();
+			( new \Corinthian\Admin\ImportPage() )->register();
 			( new TableUi( $plugin ) )->register();
 			add_action(
 				'admin_init',

@@ -6,6 +6,8 @@ use Corinthian\Screens\Screen;
 use WP_Error;
 use WP_Term;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Validation and storage for editing term columns, through wp_update_term.
  */

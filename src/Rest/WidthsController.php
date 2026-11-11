@@ -9,6 +9,8 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Per-user column widths set by dragging column edges on a list table.
  */
@@ -89,8 +91,9 @@ final class WidthsController {
 	}
 
 	private function visible_set( WP_REST_Request $request ): \Corinthian\Sets\ColumnSet|WP_Error {
-		$set = $this->plugin->sets->find( (int) $request->get_param( 'set' ) );
-		if ( ! $set || $set->screen !== (string) $request->get_param( 'screen' ) || ! $set->visible_to( wp_get_current_user() ) ) {
+		$set    = $this->plugin->sets->find( (int) $request->get_param( 'set' ) );
+		$screen = $set ? $this->plugin->screens->get( $set->screen ) : null;
+		if ( ! $set || ! $screen || $set->screen !== (string) $request->get_param( 'screen' ) || ! $set->visible_to( wp_get_current_user() ) || ! $screen->user_can_list() ) {
 			return new WP_Error( 'corinthian_not_found', __( 'Column set not found.', 'corinthian-admin-column-manager' ), array( 'status' => 404 ) );
 		}
 		return $set;

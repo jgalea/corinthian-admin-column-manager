@@ -1,6 +1,18 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, TextControl, SelectControl, ToggleControl, Icon } from '@wordpress/components';
-import { chevronUp, chevronDown, chevronRight, trash, dragHandle } from '@wordpress/icons';
+import {
+	Button,
+	TextControl,
+	SelectControl,
+	ToggleControl,
+	Icon,
+} from '@wordpress/components';
+import {
+	chevronUp,
+	chevronDown,
+	chevronRight,
+	trash,
+	dragHandle,
+} from '@wordpress/icons';
 import { applyFilters } from '@wordpress/hooks';
 import { optionList } from './model';
 
@@ -19,7 +31,14 @@ function Field( { field, value, onChange, listId } ) {
 				/>
 			);
 		case 'toggle':
-			return <ToggleControl __nextHasNoMarginBottom label={ field.label } checked={ !! current } onChange={ onChange } />;
+			return (
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ field.label }
+					checked={ !! current }
+					onChange={ onChange }
+				/>
+			);
 		case 'number':
 			return (
 				<TextControl
@@ -45,7 +64,13 @@ function Field( { field, value, onChange, listId } ) {
 			);
 		default:
 			return (
-				<TextControl __nextHasNoMarginBottom __next40pxDefaultSize label={ field.label } value={ current } onChange={ onChange } />
+				<TextControl
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+					label={ field.label }
+					value={ current }
+					onChange={ onChange }
+				/>
 			);
 	}
 }
@@ -72,13 +97,28 @@ export default function ColumnRow( {
 	const unavailable = ! typeInfo && column.type !== 'native';
 	const flags = applyFilters(
 		'corinthian.editor.columnToggles',
-		typeInfo?.sortable ? [ { name: 'sortable', label: __( 'Sortable', 'corinthian-admin-column-manager' ), def: true } ] : [],
+		typeInfo?.sortable
+			? [
+					{
+						name: 'sortable',
+						label: __(
+							'Sortable',
+							'corinthian-admin-column-manager'
+						),
+						def: true,
+					},
+			  ]
+			: [],
 		typeInfo
 	);
 	const panelId = `corinthian-panel-${ column.id }`;
 	const classes = [ 'corinthian-row' ];
-	if ( dragging ) classes.push( 'is-dragging' );
-	if ( dropTarget ) classes.push( 'is-drop-target' );
+	if ( dragging ) {
+		classes.push( 'is-dragging' );
+	}
+	if ( dropTarget ) {
+		classes.push( 'is-drop-target' );
+	}
 
 	return (
 		<li
@@ -104,17 +144,34 @@ export default function ColumnRow( {
 					aria-controls={ panelId }
 					label={ sprintf(
 						/* translators: %s: column label */
-						__( 'Settings for %s', 'corinthian-admin-column-manager' ),
+						__(
+							'Settings for %s',
+							'corinthian-admin-column-manager'
+						),
 						column.label
 					) }
 					onClick={ onToggle }
-					className={ 'corinthian-row__toggle' + ( expanded ? ' is-open' : '' ) }
+					className={
+						'corinthian-row__toggle' +
+						( expanded ? ' is-open' : '' )
+					}
 				/>
 				<div className="corinthian-row__title">
-					<span className="corinthian-row__label">{ column.label || __( '(no label)', 'corinthian-admin-column-manager' ) }</span>
+					<span className="corinthian-row__label">
+						{ column.label ||
+							__(
+								'(no label)',
+								'corinthian-admin-column-manager'
+							) }
+					</span>
 					<span className="corinthian-row__type">{ typeLabel }</span>
 					{ unavailable && (
-						<span className="corinthian-row__unavailable">{ __( 'Unavailable: its plugin is inactive', 'corinthian-admin-column-manager' ) }</span>
+						<span className="corinthian-row__unavailable">
+							{ __(
+								'Unavailable: its plugin is inactive',
+								'corinthian-admin-column-manager'
+							) }
+						</span>
 					) }
 				</div>
 				<div className="corinthian-row__width">
@@ -126,12 +183,25 @@ export default function ColumnRow( {
 						hideLabelFromVision
 						label={ sprintf(
 							/* translators: %s: column label */
-							__( 'Width of %s', 'corinthian-admin-column-manager' ),
+							__(
+								'Width of %s',
+								'corinthian-admin-column-manager'
+							),
 							column.label
 						) }
-						placeholder={ __( 'Auto', 'corinthian-admin-column-manager' ) }
+						placeholder={ __(
+							'Auto',
+							'corinthian-admin-column-manager'
+						) }
 						value={ column.width ?? '' }
-						onChange={ ( v ) => onChange( { width: v === '' ? null : Math.max( 0, parseInt( v, 10 ) || 0 ) } ) }
+						onChange={ ( v ) =>
+							onChange( {
+								width:
+									v === ''
+										? null
+										: Math.max( 0, parseInt( v, 10 ) || 0 ),
+							} )
+						}
 					/>
 					<SelectControl
 						__nextHasNoMarginBottom
@@ -139,7 +209,10 @@ export default function ColumnRow( {
 						hideLabelFromVision
 						label={ sprintf(
 							/* translators: %s: column label */
-							__( 'Width unit of %s', 'corinthian-admin-column-manager' ),
+							__(
+								'Width unit of %s',
+								'corinthian-admin-column-manager'
+							),
 							column.label
 						) }
 						value={ column.width_unit }
@@ -153,17 +226,31 @@ export default function ColumnRow( {
 				<div className="corinthian-row__actions">
 					<Button
 						icon={ chevronUp }
-						label={ __( 'Move up', 'corinthian-admin-column-manager' ) }
+						label={ __(
+							'Move up',
+							'corinthian-admin-column-manager'
+						) }
 						disabled={ index === 0 }
 						onClick={ () => onMove( index, index - 1 ) }
 					/>
 					<Button
 						icon={ chevronDown }
-						label={ __( 'Move down', 'corinthian-admin-column-manager' ) }
+						label={ __(
+							'Move down',
+							'corinthian-admin-column-manager'
+						) }
 						disabled={ index === count - 1 }
 						onClick={ () => onMove( index, index + 1 ) }
 					/>
-					<Button icon={ trash } label={ __( 'Remove column', 'corinthian-admin-column-manager' ) } isDestructive onClick={ onRemove } />
+					<Button
+						icon={ trash }
+						label={ __(
+							'Remove column',
+							'corinthian-admin-column-manager'
+						) }
+						isDestructive
+						onClick={ onRemove }
+					/>
 				</div>
 			</div>
 			{ expanded && (
@@ -171,7 +258,10 @@ export default function ColumnRow( {
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
-						label={ __( 'Label', 'corinthian-admin-column-manager' ) }
+						label={ __(
+							'Label',
+							'corinthian-admin-column-manager'
+						) }
 						value={ column.label }
 						onChange={ ( v ) => onChange( { label: v } ) }
 					/>
@@ -182,7 +272,14 @@ export default function ColumnRow( {
 								field={ field }
 								value={ column.settings[ field.name ] }
 								listId="corinthian-meta-keys"
-								onChange={ ( v ) => onChange( { settings: { ...column.settings, [ field.name ]: v } } ) }
+								onChange={ ( v ) =>
+									onChange( {
+										settings: {
+											...column.settings,
+											[ field.name ]: v,
+										},
+									} )
+								}
 							/>
 						) ) }
 					{ flags.length > 0 && (
@@ -192,8 +289,17 @@ export default function ColumnRow( {
 									__nextHasNoMarginBottom
 									key={ f.name }
 									label={ f.label }
-									checked={ column.settings[ f.name ] ?? f.def }
-									onChange={ ( v ) => onChange( { settings: { ...column.settings, [ f.name ]: v } } ) }
+									checked={
+										column.settings[ f.name ] ?? f.def
+									}
+									onChange={ ( v ) =>
+										onChange( {
+											settings: {
+												...column.settings,
+												[ f.name ]: v,
+											},
+										} )
+									}
 								/>
 							) ) }
 						</div>

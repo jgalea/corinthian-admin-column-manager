@@ -4,6 +4,8 @@ namespace Corinthian\Sets;
 
 use Corinthian\Columns\Config;
 
+defined( 'ABSPATH' ) || exit;
+
 final class ColumnSet {
 
 	/**
@@ -53,7 +55,11 @@ final class ColumnSet {
 		if ( array() === $roles && array() === $users ) {
 			return true;
 		}
-		return in_array( (int) $user->ID, $users, true ) || array() !== array_intersect( $roles, (array) $user->roles );
+		$held = (array) $user->roles;
+		if ( is_multisite() && is_super_admin( $user->ID ) ) {
+			$held[] = 'administrator';
+		}
+		return in_array( (int) $user->ID, $users, true ) || array() !== array_intersect( $roles, $held );
 	}
 
 	/**

@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Media;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Attachment columns that are not sortable: dimensions, caption, description, URL, sizes, featured image use.
  */

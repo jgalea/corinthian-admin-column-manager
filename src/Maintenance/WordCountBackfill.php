@@ -4,6 +4,8 @@ namespace Corinthian\Maintenance;
 
 use Corinthian\Columns\Types\WordCountMeta;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Stores word counts for posts saved before Corinthian was active, so word
  * count and reading time sort and filter correctly across the whole site.
@@ -25,8 +27,16 @@ final class WordCountBackfill {
 		add_action(
 			'admin_init',
 			static function () {
-				if ( ! get_option( self::OPTION ) && ! wp_next_scheduled( self::HOOK ) ) {
+				if ( ! get_option( self::OPTION ) && ! wp_next_scheduled( self::HOOK ) && WordCountMeta::in_use() ) {
 					wp_schedule_single_event( time() + 30, self::HOOK );
+				}
+			}
+		);
+		add_action(
+			'corinthian_set_saved',
+			static function ( $set ): void {
+				if ( array() !== array_intersect( array_map( static fn( $c ) => $c->type, $set->columns ), WordCountMeta::types() ) ) {
+					delete_option( self::OPTION );
 				}
 			}
 		);
@@ -44,7 +54,7 @@ final class WordCountBackfill {
 			WordCountMeta::store( $id );
 		}
 		if ( count( $ids ) < self::BATCH ) {
-			update_option( self::OPTION, time(), false );
+			update_option( self::OPTION, time(), true );
 		} elseif ( ! wp_next_scheduled( self::HOOK ) ) {
 			wp_schedule_single_event( time() + 10, self::HOOK );
 		}

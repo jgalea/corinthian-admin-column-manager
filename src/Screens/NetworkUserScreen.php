@@ -2,6 +2,8 @@
 
 namespace Corinthian\Screens;
 
+defined( 'ABSPATH' ) || exit;
+
 final class NetworkUserScreen extends UserScreen {
 
 	public function key(): string {

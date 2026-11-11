@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Media;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Implements Editable for a media column by handing the work to MediaEditor.
  */

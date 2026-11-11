@@ -6,6 +6,8 @@ use Corinthian\Columns\Types\Users\ScreenFieldType;
 use Corinthian\Screens\Screen;
 use WP_Site;
 
+defined( 'ABSPATH' ) || exit;
+
 abstract class AbstractSiteType extends ScreenFieldType {
 
 	protected function prefix(): string {

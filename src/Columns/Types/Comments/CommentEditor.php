@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Comments;
 use WP_Comment;
 use WP_Error;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Validation and storage for editing comment columns, through wp_update_comment
  * and wp_set_comment_status.

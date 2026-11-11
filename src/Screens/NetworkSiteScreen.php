@@ -4,6 +4,8 @@ namespace Corinthian\Screens;
 
 use WP_Site_Query;
 
+defined( 'ABSPATH' ) || exit;
+
 final class NetworkSiteScreen extends Screen {
 
 	public function key(): string {

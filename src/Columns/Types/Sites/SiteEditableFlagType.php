@@ -7,6 +7,8 @@ use Corinthian\Columns\Editable;
 use Corinthian\Screens\Screen;
 use WP_Error;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The flags a network admin may flip from the list: public and archived.
  */

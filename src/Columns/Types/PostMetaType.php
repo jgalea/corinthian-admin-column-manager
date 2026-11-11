@@ -9,6 +9,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Any post meta key, shown as text, number, date, image, URL or yes/no.
  */
@@ -108,7 +110,7 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 			return $clauses;
 		}
 
-		$clauses['join'] .= $wpdb->prepare( " LEFT JOIN {$wpdb->postmeta} AS {$alias} ON ({$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = %s)", $key ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$clauses['join']   .= $wpdb->prepare( " LEFT JOIN {$wpdb->postmeta} AS {$alias} ON ({$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = %s)", $key ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$clauses['groupby'] = "{$wpdb->posts}.ID";
 
 		$expr = match ( $config->setting( 'display', 'text' ) ) {
@@ -138,11 +140,31 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 		if ( 'number' === $display ) {
 			return array_merge(
 				array(
-					array( 'op' => 'eq', 'label' => '=', 'input' => 'number' ),
-					array( 'op' => 'neq', 'label' => '≠', 'input' => 'number' ),
-					array( 'op' => 'gt', 'label' => '>', 'input' => 'number' ),
-					array( 'op' => 'lt', 'label' => '<', 'input' => 'number' ),
-					array( 'op' => 'between', 'label' => __( 'between', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
+					array(
+						'op'    => 'eq',
+						'label' => '=',
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'neq',
+						'label' => '≠',
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'gt',
+						'label' => '>',
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'lt',
+						'label' => '<',
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'between',
+						'label' => __( 'between', 'corinthian-admin-column-manager' ),
+						'input' => 'number',
+					),
 				),
 				$empty
 			);
@@ -150,26 +172,70 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 		if ( 'date' === $display ) {
 			return array_merge(
 				array(
-					array( 'op' => 'before', 'label' => __( 'before', 'corinthian-admin-column-manager' ), 'input' => 'date' ),
-					array( 'op' => 'after', 'label' => __( 'after', 'corinthian-admin-column-manager' ), 'input' => 'date' ),
-					array( 'op' => 'within_days', 'label' => __( 'in the last (days)', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
-					array( 'op' => 'older_than_days', 'label' => __( 'older than (days)', 'corinthian-admin-column-manager' ), 'input' => 'number' ),
+					array(
+						'op'    => 'before',
+						'label' => __( 'before', 'corinthian-admin-column-manager' ),
+						'input' => 'date',
+					),
+					array(
+						'op'    => 'after',
+						'label' => __( 'after', 'corinthian-admin-column-manager' ),
+						'input' => 'date',
+					),
+					array(
+						'op'    => 'within_days',
+						'label' => __( 'in the last (days)', 'corinthian-admin-column-manager' ),
+						'input' => 'number',
+					),
+					array(
+						'op'    => 'older_than_days',
+						'label' => __( 'older than (days)', 'corinthian-admin-column-manager' ),
+						'input' => 'number',
+					),
 				),
 				$empty
 			);
 		}
 		if ( 'boolean' === $display ) {
 			return array(
-				array( 'op' => 'eq', 'label' => __( 'is', 'corinthian-admin-column-manager' ), 'input' => 'select', 'options' => array( '1' => __( 'Yes', 'corinthian-admin-column-manager' ), '0' => __( 'No', 'corinthian-admin-column-manager' ) ) ),
+				array(
+					'op'      => 'eq',
+					'label'   => __( 'is', 'corinthian-admin-column-manager' ),
+					'input'   => 'select',
+					'options' => array(
+						'1' => __( 'Yes', 'corinthian-admin-column-manager' ),
+						'0' => __( 'No', 'corinthian-admin-column-manager' ),
+					),
+				),
 			);
 		}
 		return array_merge(
 			array(
-				array( 'op' => 'contains', 'label' => __( 'contains', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-				array( 'op' => 'not_contains', 'label' => __( 'does not contain', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-				array( 'op' => 'eq', 'label' => __( 'is', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-				array( 'op' => 'neq', 'label' => __( 'is not', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
-				array( 'op' => 'starts', 'label' => __( 'starts with', 'corinthian-admin-column-manager' ), 'input' => 'text' ),
+				array(
+					'op'    => 'contains',
+					'label' => __( 'contains', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
+				array(
+					'op'    => 'not_contains',
+					'label' => __( 'does not contain', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
+				array(
+					'op'    => 'eq',
+					'label' => __( 'is', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
+				array(
+					'op'    => 'neq',
+					'label' => __( 'is not', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
+				array(
+					'op'    => 'starts',
+					'label' => __( 'starts with', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
 			),
 			$empty
 		);

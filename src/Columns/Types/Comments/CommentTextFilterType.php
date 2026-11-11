@@ -8,6 +8,8 @@ use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The comment text columns that can be filtered: author URL, excerpt and user agent.
  */

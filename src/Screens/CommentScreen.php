@@ -4,6 +4,8 @@ namespace Corinthian\Screens;
 
 use WP_Comment_Query;
 
+defined( 'ABSPATH' ) || exit;
+
 final class CommentScreen extends Screen {
 
 	public function key(): string {

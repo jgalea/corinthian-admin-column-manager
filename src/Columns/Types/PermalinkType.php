@@ -6,6 +6,8 @@ use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 final class PermalinkType extends AbstractPostType {
 
 	public function key(): string {

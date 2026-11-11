@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Users;
 
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 class UserMetaType extends AbstractMetaType {
 
 	protected function prefix(): string {

@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Users;
 
 use WP_Error;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Validation and storage for editing user columns. Writes go through
  * wp_update_user, and each change checks the capability it needs.
@@ -33,7 +35,7 @@ final class UserEditor {
 	 * @return array<string,mixed>
 	 */
 	public static function field( string $kind ): array {
-		$field   = array(
+		$field = array(
 			'input' => match ( $kind ) {
 				'description'                       => 'textarea',
 				'roles', 'locale', 'admin_color'    => 'select',
@@ -61,13 +63,14 @@ final class UserEditor {
 		if ( ! $user ) {
 			return null;
 		}
+		$color = (string) get_user_meta( $id, 'admin_color', true );
 		return match ( $kind ) {
 			'display_name' => (string) $user->display_name,
 			'email'       => (string) $user->user_email,
 			'website'     => (string) $user->user_url,
 			'roles'       => (string) ( array_values( $user->roles )[0] ?? '' ),
 			'rich_editing' => 'false' !== get_user_meta( $id, 'rich_editing', true ),
-			'admin_color' => (string) ( get_user_meta( $id, 'admin_color', true ) ?: 'fresh' ),
+			'admin_color' => '' !== $color ? $color : 'fresh',
 			default       => (string) get_user_meta( $id, $kind, true ),
 		};
 	}

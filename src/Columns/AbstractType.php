@@ -4,6 +4,8 @@ namespace Corinthian\Columns;
 
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 abstract class AbstractType implements ColumnType {
 
 	public function settings_schema( Screen $screen ): array {

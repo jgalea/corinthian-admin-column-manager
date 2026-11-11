@@ -4,6 +4,8 @@ namespace Corinthian\Columns\Types\Users;
 
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 abstract class AbstractUserType extends ScreenFieldType {
 
 	protected function prefix(): string {

@@ -86,6 +86,19 @@ class PostTypesTest extends WP_UnitTestCase {
 		parent::set_up();
 		$this->set_permalink_structure( '/%postname%/' );
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		// A set that shows word counts, so posts store theirs on save.
+		( new SetRepository() )->save(
+			array(
+				'screen'  => 'post:post',
+				'title'   => 'Counts',
+				'columns' => array(
+					array(
+						'id'   => 'wc',
+						'type' => 'post.word_count',
+					),
+				),
+			)
+		);
 
 		register_taxonomy(
 			'corinthian_topic',

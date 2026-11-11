@@ -5,6 +5,8 @@ namespace Corinthian\Columns\Types\Sites;
 use Corinthian\Columns\Config;
 use Corinthian\Screens\Screen;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Published posts of a site. Each count switches to the site, so results are
  * cached for five minutes and a single request looks up at most LOOKUP_CAP

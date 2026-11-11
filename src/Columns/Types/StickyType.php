@@ -9,6 +9,8 @@ use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 final class StickyType extends AbstractPostType implements Sortable, Filterable, Editable {
 
 	use EditsPost;

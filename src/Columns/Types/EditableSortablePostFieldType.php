@@ -6,6 +6,8 @@ use Closure;
 use Corinthian\Columns\Editable;
 use WP_Post;
 
+defined( 'ABSPATH' ) || exit;
+
 final class EditableSortablePostFieldType extends SortablePostFieldType implements Editable {
 
 	use EditsPost;

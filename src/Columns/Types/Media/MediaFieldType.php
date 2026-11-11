@@ -9,6 +9,8 @@ use Corinthian\Columns\Filterable;
 use Corinthian\Columns\Types\Users\FilterSql;
 use Corinthian\Columns\Types\Users\FiltersField;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Attachment columns that sort in SQL: file name, MIME type, alt text, parent and uploader.
  */

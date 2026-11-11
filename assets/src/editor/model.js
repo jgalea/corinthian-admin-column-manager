@@ -1,5 +1,8 @@
 export const slug = ( value ) =>
-	String( value ).toLowerCase().replace( /[^a-z0-9_]/g, '_' ).replace( /^_+|_+$/g, '' ) || 'column';
+	String( value )
+		.toLowerCase()
+		.replace( /[^a-z0-9_]/g, '_' )
+		.replace( /^_+|_+$/g, '' ) || 'column';
 
 export const uniqueId = ( base, columns ) => {
 	const taken = new Set( columns.map( ( c ) => c.id ) );
@@ -14,8 +17,13 @@ export const uniqueId = ( base, columns ) => {
 
 export const optionList = ( options ) =>
 	Array.isArray( options )
-		? options.map( ( o ) => ( typeof o === 'object' ? o : { value: o, label: String( o ) } ) )
-		: Object.entries( options || {} ).map( ( [ value, label ] ) => ( { value, label } ) );
+		? options.map( ( o ) =>
+				typeof o === 'object' ? o : { value: o, label: String( o ) }
+		  )
+		: Object.entries( options || {} ).map( ( [ value, label ] ) => ( {
+				value,
+				label,
+		  } ) );
 
 export const defaultSettings = ( fields ) => {
 	const out = {};
@@ -48,7 +56,13 @@ export const blankSet = ( screen, columns = [] ) => ( {
 	screen,
 	title: '',
 	columns,
-	settings: { roles: [], horizontal_scroll: false, sticky_header: false, resize_columns: true },
+	settings: {
+		roles: [],
+		users: [],
+		fit_width: false,
+		sticky_header: false,
+		resize_columns: true,
+	},
 	position: 0,
 } );
 
@@ -56,7 +70,7 @@ export const normalise = ( set ) => ( {
 	...set,
 	settings: {
 		roles: [],
-		horizontal_scroll: false,
+		fit_width: false,
 		sticky_header: false,
 		resize_columns: true,
 		...( Array.isArray( set.settings ) ? {} : set.settings ),

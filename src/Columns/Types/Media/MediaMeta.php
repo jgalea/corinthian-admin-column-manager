@@ -2,6 +2,8 @@
 
 namespace Corinthian\Columns\Types\Media;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * File size and pixel dimensions cached as plain post meta, because the
  * values inside _wp_attachment_metadata are serialized and cannot be sorted in SQL.
