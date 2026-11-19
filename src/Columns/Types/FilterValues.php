@@ -80,8 +80,8 @@ final class FilterValues {
 	}
 
 	/**
-	 * Users by display name. People who can list users can also match on
-	 * username and email, which other screens already show them.
+	 * Users by display name. People who can list users also match on username
+	 * and email; everyone else sees only users who can write posts.
 	 *
 	 * @return array{options:array<string,string>,more:bool}
 	 */
@@ -96,6 +96,9 @@ final class FilterValues {
 			'fields'      => array( 'ID', 'display_name' ),
 			'count_total' => false,
 		);
+		if ( ! current_user_can( 'list_users' ) ) {
+			$args['capability'] = 'edit_posts';
+		}
 		if ( '' !== $search ) {
 			$args['search']         = '*' . $search . '*';
 			$args['search_columns'] = current_user_can( 'list_users' ) ? array( 'display_name', 'user_login', 'user_email' ) : array( 'display_name' );
@@ -116,15 +119,17 @@ final class FilterValues {
 		if ( ! $ids ) {
 			return array();
 		}
+		$args = array(
+			'include'     => $ids,
+			'number'      => count( $ids ),
+			'fields'      => array( 'ID', 'display_name' ),
+			'count_total' => false,
+		);
+		if ( ! current_user_can( 'list_users' ) ) {
+			$args['capability'] = 'edit_posts';
+		}
 		$out = array();
-		foreach ( get_users(
-			array(
-				'include'     => $ids,
-				'number'      => count( $ids ),
-				'fields'      => array( 'ID', 'display_name' ),
-				'count_total' => false,
-			)
-		) as $user ) {
+		foreach ( get_users( $args ) as $user ) {
 			$out[ (string) $user->ID ] = self::label( (string) $user->display_name, (int) $user->ID );
 		}
 		return $out;
