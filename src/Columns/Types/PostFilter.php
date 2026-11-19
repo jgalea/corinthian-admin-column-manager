@@ -4,6 +4,7 @@ namespace Corinthian\Columns\Types;
 
 use Closure;
 use Corinthian\Columns\Config;
+use Corinthian\Columns\FilterOptions;
 use Corinthian\Screens\Screen;
 
 defined( 'ABSPATH' ) || exit;
@@ -20,7 +21,12 @@ final class PostFilter {
 	public function __construct(
 		private Closure $operators,
 		private Closure $condition,
+		private ?FilterOptions $values = null,
 	) {}
+
+	public function values(): ?FilterOptions {
+		return $this->values;
+	}
 
 	/**
 	 * @return list<array<string,mixed>>
@@ -110,6 +116,18 @@ final class PostFilter {
 				$exists = $wpdb->prepare( "EXISTS (SELECT 1 FROM {$wpdb->postmeta} AS {$alias} WHERE {$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = %s AND CAST({$alias}.meta_value AS UNSIGNED) IN ({$marks}))", array_merge( array( $meta_key ), $ids ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 				return self::wrap( 'in' === $op ? $exists : "NOT {$exists}" );
 			}
+		);
+	}
+
+	/**
+	 * Posts whose single meta value is a user id, picked from a searchable user list.
+	 */
+	public static function meta_users( string $meta_key ): self {
+		$users = FilterValues::user_source();
+		return new self(
+			static fn( Config $c, Screen $s ) => FilterValues::in_ops( $users, $c, $s ),
+			self::meta_ids( $meta_key, static fn() => array() )->condition,
+			$users
 		);
 	}
 
@@ -429,22 +447,5 @@ final class PostFilter {
 			}
 		}
 		return array_values( array_unique( $out ) );
-	}
-
-	/**
-	 * @return array<string,string>
-	 */
-	public static function author_options(): array {
-		$out = array();
-		foreach ( get_users(
-			array(
-				'number'  => 200,
-				'orderby' => 'display_name',
-				'fields'  => array( 'ID', 'display_name' ),
-			)
-		) as $user ) {
-			$out[ (string) $user->ID ] = $user->display_name;
-		}
-		return $out;
 	}
 }

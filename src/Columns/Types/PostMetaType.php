@@ -6,6 +6,7 @@ use Corinthian\Columns\AbstractType;
 use Corinthian\Columns\Config;
 use Corinthian\Columns\Editable;
 use Corinthian\Columns\Filterable;
+use Corinthian\Columns\FilterOptions;
 use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 
@@ -14,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Any post meta key, shown as text, number, date, image, URL or yes/no.
  */
-final class PostMetaType extends AbstractType implements Sortable, Filterable, Editable {
+final class PostMetaType extends AbstractType implements Sortable, Filterable, FilterOptions, Editable {
 
 	public function key(): string {
 		return 'post.meta';
@@ -209,7 +210,7 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 				),
 			);
 		}
-		return array_merge(
+		$text_ops = array_merge(
 			array(
 				array(
 					'op'    => 'contains',
@@ -239,6 +240,32 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 			),
 			$empty
 		);
+		return FilterValues::meta_ops( $this, $config, $screen, $text_ops );
+	}
+
+	/**
+	 * Distinct values of a text field on this post type. Private posts count
+	 * only for people who could read them in the list.
+	 */
+	public function filter_options( Config $config, Screen $screen, string $search, int $page, int $per_page ): array {
+		$key = (string) $config->setting( 'meta_key', '' );
+		if ( '' === $key || in_array( $config->setting( 'display', 'text' ), array( 'number', 'date', 'boolean' ), true ) ) {
+			return array(
+				'options' => array(),
+				'more'    => false,
+			);
+		}
+		global $wpdb;
+		$scope     = $wpdb->prepare( "INNER JOIN {$wpdb->posts} AS p ON p.ID = m.post_id AND p.post_type = %s AND p.post_status <> 'auto-draft'", $screen->subtype() ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$post_type = get_post_type_object( $screen->subtype() );
+		if ( ! $post_type || ! current_user_can( $post_type->cap->read_private_posts ) ) {
+			$scope .= $wpdb->prepare( " AND (p.post_status <> 'private' OR p.post_author = %d)", get_current_user_id() );
+		}
+		return FilterValues::meta( $wpdb->postmeta, 'posts', $key, $search, $page, $per_page, $scope );
+	}
+
+	public function filter_labels( Config $config, Screen $screen, array $values ): array {
+		return FilterValues::meta_labels( $values );
 	}
 
 	public function filter_condition( Config $config, string $op, mixed $value, Screen $screen, string $alias ): ?array {
@@ -246,6 +273,22 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 		$key = (string) $config->setting( 'meta_key', '' );
 		if ( '' === $key ) {
 			return null;
+		}
+		if ( 'in' === $op || 'not_in' === $op ) {
+			return PostFilter::wrap(
+				Users\FilterSql::meta(
+					Users\FilterSql::ENUM,
+					$op,
+					$value,
+					array(
+						'table'     => $wpdb->postmeta,
+						'id_column' => 'post_id',
+						'outer_id'  => "{$wpdb->posts}.ID",
+						'key'       => $key,
+					),
+					$alias
+				)
+			);
 		}
 		// One meta row per post for the comparison; posts without the key get NULL.
 		$join = $wpdb->prepare( " LEFT JOIN {$wpdb->postmeta} AS {$alias} ON ({$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = %s)", $key ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared

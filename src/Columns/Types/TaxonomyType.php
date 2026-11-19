@@ -5,6 +5,7 @@ namespace Corinthian\Columns\Types;
 use Corinthian\Columns\Config;
 use Corinthian\Columns\Editable;
 use Corinthian\Columns\Filterable;
+use Corinthian\Columns\FilterOptions;
 use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 use WP_Post;
@@ -12,7 +13,7 @@ use WP_Term;
 
 defined( 'ABSPATH' ) || exit;
 
-final class TaxonomyType extends AbstractPostType implements Sortable, Filterable, Editable {
+final class TaxonomyType extends AbstractPostType implements Sortable, Filterable, FilterOptions, Editable {
 
 	use EditsPost;
 
@@ -105,23 +106,15 @@ final class TaxonomyType extends AbstractPostType implements Sortable, Filterabl
 	}
 
 	public function filter_operators( Config $config, Screen $screen ): array {
-		$taxonomy = $this->chosen( $config, $screen );
-		$options  = array();
-		if ( '' !== $taxonomy ) {
-			$terms = get_terms(
-				array(
-					'taxonomy'   => $taxonomy,
-					'hide_empty' => false,
-					'number'     => 500,
-					'orderby'    => 'name',
-					'fields'     => 'id=>name',
-				)
-			);
-			foreach ( is_array( $terms ) ? $terms : array() as $id => $name ) {
-				$options[ (string) $id ] = (string) $name;
-			}
-		}
-		return PostFilter::in_ops( $options, true );
+		return FilterValues::in_ops( $this, $config, $screen, true );
+	}
+
+	public function filter_options( Config $config, Screen $screen, string $search, int $page, int $per_page ): array {
+		return FilterValues::terms( $this->chosen( $config, $screen ), $search, $page, $per_page );
+	}
+
+	public function filter_labels( Config $config, Screen $screen, array $values ): array {
+		return FilterValues::term_labels( $this->chosen( $config, $screen ), $values );
 	}
 
 	public function filter_condition( Config $config, string $op, mixed $value, Screen $screen, string $alias ): ?array {
