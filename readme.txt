@@ -4,7 +4,7 @@ Tags: admin columns, columns, list table, custom fields, sort
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.1
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,7 +69,10 @@ JavaScript hooks (`wp.hooks`): the `corinthian.table.ready` action, and the `cor
 
 == Changelog ==
 
-= Unreleased =
+= 0.2.0 =
+* Date columns filter by on, before, after, between, today, this week, this month, in the last or next number of days, older than a number of days, and in the future.
+* The post title, text, number and date columns filter on whether they're empty, and text matches can start or end with a value.
+* Author, taxonomy and custom field columns list the values in use for Corinthian Admin Column Manager PRO's value picker, with parent names on categories that share a name. People who can't list users see only users who write posts, and a site in a network lists user meta from its own members.
 * Duplicating a column set to another screen leaves out formatting rules and shared segments that use columns the target screen doesn't have.
 * Meta keys on user columns are checked the way WordPress stores them (case, spaces and slashes), and only letters, numbers, dashes and underscores are editable.
 * A column set with a sticky header now keeps its header under the admin bar while the page scrolls, with no scroll box of its own inside the page.

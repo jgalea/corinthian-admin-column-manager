@@ -5,7 +5,9 @@ namespace Corinthian\Columns\Types\Users;
 use Corinthian\Columns\Config;
 use Corinthian\Columns\Editable;
 use Corinthian\Columns\Filterable;
+use Corinthian\Columns\FilterOptions;
 use Corinthian\Columns\Sortable;
+use Corinthian\Columns\Types\FilterValues;
 use Corinthian\Screens\Screen;
 
 defined( 'ABSPATH' ) || exit;
@@ -13,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Any meta key on a user, comment or term, shown like the post custom field column.
  */
-abstract class AbstractMetaType extends ScreenFieldType implements Sortable, Filterable, Editable {
+abstract class AbstractMetaType extends ScreenFieldType implements Sortable, Filterable, FilterOptions, Editable {
 
 	public function __construct( string $field = 'meta' ) {
 		parent::__construct( $field );
@@ -138,7 +140,36 @@ abstract class AbstractMetaType extends ScreenFieldType implements Sortable, Fil
 	}
 
 	public function filter_operators( Config $config, Screen $screen ): array {
-		return FilterSql::meta_operators( (string) $config->setting( 'display', $this->default_display() ) );
+		$display = (string) $config->setting( 'display', $this->default_display() );
+		$ops     = FilterSql::meta_operators( $display );
+		return FilterSql::TEXT === FilterSql::meta_kind( $display ) ? FilterValues::meta_ops( $this, $config, $screen, $ops ) : $ops;
+	}
+
+	public function filter_options( Config $config, Screen $screen, string $search, int $page, int $per_page ): array {
+		$key = $this->meta_key( $config );
+		if ( '' === $key || FilterSql::TEXT !== FilterSql::meta_kind( (string) $config->setting( 'display', $this->default_display() ) ) ) {
+			return array(
+				'options' => array(),
+				'more'    => false,
+			);
+		}
+		$group = array(
+			'user' => 'users',
+			'term' => 'terms',
+		)[ $this->prefix() ] ?? 'comment';
+		return FilterValues::meta( $this->meta_table(), $group, $key, $search, $page, $per_page, $this->meta_scope( $screen ) );
+	}
+
+	public function filter_labels( Config $config, Screen $screen, array $values ): array {
+		return FilterValues::meta_labels( $values );
+	}
+
+	/**
+	 * A prepared JOIN on the meta table (alias "m") that keeps only objects
+	 * belonging to this screen.
+	 */
+	protected function meta_scope( Screen $screen ): string {
+		return '';
 	}
 
 	public function filter_condition( Config $config, string $op, mixed $value, Screen $screen, string $alias ): ?array {
@@ -147,7 +178,7 @@ abstract class AbstractMetaType extends ScreenFieldType implements Sortable, Fil
 			return null;
 		}
 		$where = FilterSql::meta(
-			FilterSql::meta_kind( (string) $config->setting( 'display', $this->default_display() ) ),
+			in_array( $op, array( 'in', 'not_in' ), true ) ? FilterSql::ENUM : FilterSql::meta_kind( (string) $config->setting( 'display', $this->default_display() ) ),
 			$op,
 			$value,
 			array(

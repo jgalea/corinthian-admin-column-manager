@@ -6,6 +6,7 @@ use Corinthian\Columns\AbstractType;
 use Corinthian\Columns\Config;
 use Corinthian\Columns\Editable;
 use Corinthian\Columns\Filterable;
+use Corinthian\Columns\FilterOptions;
 use Corinthian\Columns\Sortable;
 use Corinthian\Screens\Screen;
 
@@ -14,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Any post meta key, shown as text, number, date, image, URL or yes/no.
  */
-final class PostMetaType extends AbstractType implements Sortable, Filterable, Editable {
+final class PostMetaType extends AbstractType implements Sortable, Filterable, FilterOptions, Editable {
 
 	public function key(): string {
 		return 'post.meta';
@@ -124,121 +125,37 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 	}
 
 	public function filter_operators( Config $config, Screen $screen ): array {
-		$display = $config->setting( 'display', 'text' );
-		$empty   = array(
-			array(
-				'op'    => 'empty',
-				'label' => __( 'is empty', 'corinthian-admin-column-manager' ),
-				'input' => 'none',
-			),
-			array(
-				'op'    => 'not_empty',
-				'label' => __( 'is not empty', 'corinthian-admin-column-manager' ),
-				'input' => 'none',
-			),
-		);
-		if ( 'number' === $display ) {
-			return array_merge(
-				array(
-					array(
-						'op'    => 'eq',
-						'label' => '=',
-						'input' => 'number',
-					),
-					array(
-						'op'    => 'neq',
-						'label' => '≠',
-						'input' => 'number',
-					),
-					array(
-						'op'    => 'gt',
-						'label' => '>',
-						'input' => 'number',
-					),
-					array(
-						'op'    => 'lt',
-						'label' => '<',
-						'input' => 'number',
-					),
-					array(
-						'op'    => 'between',
-						'label' => __( 'between', 'corinthian-admin-column-manager' ),
-						'input' => 'number',
-					),
-				),
-				$empty
-			);
-		}
-		if ( 'date' === $display ) {
-			return array_merge(
-				array(
-					array(
-						'op'    => 'before',
-						'label' => __( 'before', 'corinthian-admin-column-manager' ),
-						'input' => 'date',
-					),
-					array(
-						'op'    => 'after',
-						'label' => __( 'after', 'corinthian-admin-column-manager' ),
-						'input' => 'date',
-					),
-					array(
-						'op'    => 'within_days',
-						'label' => __( 'in the last (days)', 'corinthian-admin-column-manager' ),
-						'input' => 'number',
-					),
-					array(
-						'op'    => 'older_than_days',
-						'label' => __( 'older than (days)', 'corinthian-admin-column-manager' ),
-						'input' => 'number',
-					),
-				),
-				$empty
-			);
-		}
-		if ( 'boolean' === $display ) {
+		return match ( $config->setting( 'display', 'text' ) ) {
+			'number'  => array_merge( PostFilter::number_ops( false ), PostFilter::empty_ops() ),
+			'date'    => array_merge( PostFilter::date_ops(), PostFilter::empty_ops() ),
+			'boolean' => PostFilter::yes_no_ops( true ),
+			default   => FilterValues::meta_ops( $this, $config, $screen, PostFilter::text_ops() ),
+		};
+	}
+
+	/**
+	 * Distinct values of a text field on this post type. Private posts count
+	 * only for people who could read them in the list.
+	 */
+	public function filter_options( Config $config, Screen $screen, string $search, int $page, int $per_page ): array {
+		$key = (string) $config->setting( 'meta_key', '' );
+		if ( '' === $key || in_array( $config->setting( 'display', 'text' ), array( 'number', 'date', 'boolean' ), true ) ) {
 			return array(
-				array(
-					'op'      => 'eq',
-					'label'   => __( 'is', 'corinthian-admin-column-manager' ),
-					'input'   => 'select',
-					'options' => array(
-						'1' => __( 'Yes', 'corinthian-admin-column-manager' ),
-						'0' => __( 'No', 'corinthian-admin-column-manager' ),
-					),
-				),
+				'options' => array(),
+				'more'    => false,
 			);
 		}
-		return array_merge(
-			array(
-				array(
-					'op'    => 'contains',
-					'label' => __( 'contains', 'corinthian-admin-column-manager' ),
-					'input' => 'text',
-				),
-				array(
-					'op'    => 'not_contains',
-					'label' => __( 'does not contain', 'corinthian-admin-column-manager' ),
-					'input' => 'text',
-				),
-				array(
-					'op'    => 'eq',
-					'label' => __( 'is', 'corinthian-admin-column-manager' ),
-					'input' => 'text',
-				),
-				array(
-					'op'    => 'neq',
-					'label' => __( 'is not', 'corinthian-admin-column-manager' ),
-					'input' => 'text',
-				),
-				array(
-					'op'    => 'starts',
-					'label' => __( 'starts with', 'corinthian-admin-column-manager' ),
-					'input' => 'text',
-				),
-			),
-			$empty
-		);
+		global $wpdb;
+		$scope     = $wpdb->prepare( "INNER JOIN {$wpdb->posts} AS p ON p.ID = m.post_id AND p.post_type = %s AND p.post_status <> 'auto-draft'", $screen->subtype() ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$post_type = get_post_type_object( $screen->subtype() );
+		if ( ! $post_type || ! current_user_can( $post_type->cap->read_private_posts ) ) {
+			$scope .= $wpdb->prepare( " AND (p.post_status <> 'private' OR p.post_author = %d)", get_current_user_id() );
+		}
+		return FilterValues::meta( $wpdb->postmeta, 'posts', $key, $search, $page, $per_page, $scope );
+	}
+
+	public function filter_labels( Config $config, Screen $screen, array $values ): array {
+		return FilterValues::meta_labels( $values );
 	}
 
 	public function filter_condition( Config $config, string $op, mixed $value, Screen $screen, string $alias ): ?array {
@@ -247,11 +164,35 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 		if ( '' === $key ) {
 			return null;
 		}
+		if ( 'in' === $op || 'not_in' === $op ) {
+			return PostFilter::wrap(
+				Users\FilterSql::meta(
+					Users\FilterSql::ENUM,
+					$op,
+					$value,
+					array(
+						'table'     => $wpdb->postmeta,
+						'id_column' => 'post_id',
+						'outer_id'  => "{$wpdb->posts}.ID",
+						'key'       => $key,
+					),
+					$alias
+				)
+			);
+		}
 		// One meta row per post for the comparison; posts without the key get NULL.
 		$join = $wpdb->prepare( " LEFT JOIN {$wpdb->postmeta} AS {$alias} ON ({$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = %s)", $key ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$col  = "{$alias}.meta_value";
 		$num  = "CAST({$col} AS DECIMAL(30,6))";
 		$v    = is_array( $value ) ? $value : (string) $value;
+
+		if ( 'date' === $config->setting( 'display' ) && in_array( $op, PostFilter::RANGE_OPS, true ) ) {
+			$where = PostFilter::meta_date_where( $col, $op, $value );
+			return null === $where ? null : array(
+				'join'  => $join,
+				'where' => $where,
+			);
+		}
 
 		// Negative ops on a LEFT JOIN must also match posts without the key.
 		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Every branch of the match builds its fragment with $wpdb->prepare() or a fixed literal; only the generated join alias and column expression are interpolated.
@@ -261,6 +202,7 @@ final class PostMetaType extends AbstractType implements Sortable, Filterable, E
 			'contains'        => is_string( $v ) && '' !== $v ? $wpdb->prepare( "{$col} LIKE %s", '%' . $wpdb->esc_like( $v ) . '%' ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'not_contains'    => is_string( $v ) && '' !== $v ? $wpdb->prepare( "({$col} IS NULL OR {$col} NOT LIKE %s)", '%' . $wpdb->esc_like( $v ) . '%' ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'starts'          => is_string( $v ) && '' !== $v ? $wpdb->prepare( "{$col} LIKE %s", $wpdb->esc_like( $v ) . '%' ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			'ends'            => is_string( $v ) && '' !== $v ? $wpdb->prepare( "{$col} LIKE %s", '%' . $wpdb->esc_like( $v ) ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'eq'              => is_string( $v ) ? ( 'number' === $config->setting( 'display' ) && is_numeric( $v ) ? $wpdb->prepare( "{$num} = %f", (float) $v ) : ( 'boolean' === $config->setting( 'display' ) ? ( '1' === $v ? "({$col} IS NOT NULL AND {$col} NOT IN ('', '0', 'false', 'no', 'off'))" : "({$col} IS NULL OR {$col} IN ('', '0', 'false', 'no', 'off'))" ) : $wpdb->prepare( "{$col} = %s", $v ) ) ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'neq'             => is_string( $v ) ? ( 'number' === $config->setting( 'display' ) && is_numeric( $v ) ? $wpdb->prepare( "({$col} IS NULL OR {$num} <> %f)", (float) $v ) : $wpdb->prepare( "({$col} IS NULL OR {$col} <> %s)", $v ) ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'gt'              => is_string( $v ) && is_numeric( $v ) ? $wpdb->prepare( "{$num} > %f", (float) $v ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared

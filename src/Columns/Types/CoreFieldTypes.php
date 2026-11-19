@@ -134,7 +134,7 @@ final class CoreFieldTypes {
 				static fn() => __( 'Last modified by', 'corinthian-admin-column-manager' ),
 				'author',
 				static fn( WP_Post $p ) => (int) get_post_meta( $p->ID, '_edit_last', true ) ? self::user_name( (int) get_post_meta( $p->ID, '_edit_last', true ) ) : null,
-				PostFilter::meta_ids( '_edit_last', static fn() => PostFilter::author_options() )
+				PostFilter::meta_users( '_edit_last' )
 			),
 			new PostFieldType(
 				'post.edit_lock',

@@ -5,6 +5,7 @@ namespace Corinthian\Columns\Types;
 use Closure;
 use Corinthian\Columns\Config;
 use Corinthian\Columns\Filterable;
+use Corinthian\Columns\FilterOptions;
 use Corinthian\Screens\Screen;
 use WP_Post;
 
@@ -13,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * A PostFieldType whose rules are compiled by a PostFilter.
  */
-class FilterablePostFieldType extends PostFieldType implements Filterable {
+class FilterablePostFieldType extends PostFieldType implements Filterable, FilterOptions {
 
 	/**
 	 * @param Closure():string                                $label
@@ -39,5 +40,16 @@ class FilterablePostFieldType extends PostFieldType implements Filterable {
 
 	public function filter_condition( Config $config, string $op, mixed $value, Screen $screen, string $alias ): ?array {
 		return $this->filter->condition( $config, $op, $value, $screen, $alias );
+	}
+
+	public function filter_options( Config $config, Screen $screen, string $search, int $page, int $per_page ): array {
+		return $this->filter->values()?->filter_options( $config, $screen, $search, $page, $per_page ) ?? array(
+			'options' => array(),
+			'more'    => false,
+		);
+	}
+
+	public function filter_labels( Config $config, Screen $screen, array $values ): array {
+		return $this->filter->values()?->filter_labels( $config, $screen, $values ) ?? array();
 	}
 }

@@ -23,6 +23,10 @@ interface Filterable {
 	 * before, after, within_days, older_than_days, empty, not_empty, in, not_in.
 	 * "between" takes [ min, max ]; "in"/"not_in" take a list.
 	 *
+	 * An operator may add 'search' => true when the column also implements
+	 * FilterOptions: its values are then searched and paged instead of being
+	 * listed in full in 'options'.
+	 *
 	 * @return list<array<string,mixed>>
 	 */
 	public function filter_operators( Config $config, Screen $screen ): array;

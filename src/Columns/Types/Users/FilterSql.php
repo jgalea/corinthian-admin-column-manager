@@ -150,6 +150,11 @@ final class FilterSql {
 							'label' => __( 'starts with', 'corinthian-admin-column-manager' ),
 							'input' => 'text',
 						),
+						array(
+							'op'    => 'ends',
+							'label' => __( 'ends with', 'corinthian-admin-column-manager' ),
+							'input' => 'text',
+						),
 					),
 					$empty
 				);
@@ -303,6 +308,8 @@ final class FilterSql {
 				return '' !== $value ? $expr . ' LIKE ' . $wpdb->prepare( '%s', '%' . $wpdb->esc_like( $value ) . '%' ) : null;
 			case 'starts':
 				return '' !== $value ? $expr . ' LIKE ' . $wpdb->prepare( '%s', $wpdb->esc_like( $value ) . '%' ) : null;
+			case 'ends':
+				return '' !== $value ? $expr . ' LIKE ' . $wpdb->prepare( '%s', '%' . $wpdb->esc_like( $value ) ) : null;
 			default:
 				return null;
 		}

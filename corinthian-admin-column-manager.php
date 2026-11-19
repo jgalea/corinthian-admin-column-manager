@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Corinthian Admin Column Manager
  * Description:       Choose, order, resize, sort and save the columns on every WordPress admin list screen.
- * Version:           0.1.1
+ * Version:           0.2.0
  * Requires at least: 6.9
  * Requires PHP:      8.1
  * Author:            Jean Galea
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CORINTHIAN_VERSION', '0.1.1' );
+define( 'CORINTHIAN_VERSION', '0.2.0' );
 define( 'CORINTHIAN_FILE', __FILE__ );
 define( 'CORINTHIAN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CORINTHIAN_URL', plugin_dir_url( __FILE__ ) );
