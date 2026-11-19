@@ -175,6 +175,11 @@ final class PostFilter {
 					'label' => __( 'starts with', 'corinthian-admin-column-manager' ),
 					'input' => 'text',
 				),
+				array(
+					'op'    => 'ends',
+					'label' => __( 'ends with', 'corinthian-admin-column-manager' ),
+					'input' => 'text',
+				),
 			),
 			self::empty_ops()
 		);
@@ -187,27 +192,27 @@ final class PostFilter {
 		$ops = array(
 			array(
 				'op'    => 'eq',
-				'label' => '=',
+				'label' => __( 'equals', 'corinthian-admin-column-manager' ),
 				'input' => 'number',
 			),
 			array(
 				'op'    => 'neq',
-				'label' => '≠',
+				'label' => __( 'does not equal', 'corinthian-admin-column-manager' ),
 				'input' => 'number',
 			),
 			array(
 				'op'    => 'gt',
-				'label' => '>',
+				'label' => __( 'is greater than', 'corinthian-admin-column-manager' ),
 				'input' => 'number',
 			),
 			array(
 				'op'    => 'lt',
-				'label' => '<',
+				'label' => __( 'is less than', 'corinthian-admin-column-manager' ),
 				'input' => 'number',
 			),
 			array(
 				'op'    => 'between',
-				'label' => __( 'between', 'corinthian-admin-column-manager' ),
+				'label' => __( 'is between', 'corinthian-admin-column-manager' ),
 				'input' => 'number',
 			),
 		);
@@ -225,27 +230,26 @@ final class PostFilter {
 	 * @return list<array<string,mixed>>
 	 */
 	public static function date_ops(): array {
-		return array(
-			array(
-				'op'    => 'before',
-				'label' => __( 'before', 'corinthian-admin-column-manager' ),
-				'input' => 'date',
+		$ops = array(
+			array( 'before', __( 'before', 'corinthian-admin-column-manager' ), 'date' ),
+			array( 'after', __( 'after', 'corinthian-admin-column-manager' ), 'date' ),
+			array( 'within_days', __( 'in the last (days)', 'corinthian-admin-column-manager' ), 'number' ),
+			array( 'older_than_days', __( 'older than (days)', 'corinthian-admin-column-manager' ), 'number' ),
+			array( 'between', __( 'between', 'corinthian-admin-column-manager' ), 'date' ),
+			array( 'on', __( 'on', 'corinthian-admin-column-manager' ), 'date' ),
+			array( 'today', __( 'today', 'corinthian-admin-column-manager' ), 'none' ),
+			array( 'future', __( 'in the future', 'corinthian-admin-column-manager' ), 'none' ),
+			array( 'next_days', __( 'in the next (days)', 'corinthian-admin-column-manager' ), 'number' ),
+			array( 'this_week', __( 'this week', 'corinthian-admin-column-manager' ), 'none' ),
+			array( 'this_month', __( 'this month', 'corinthian-admin-column-manager' ), 'none' ),
+		);
+		return array_map(
+			static fn( array $o ) => array(
+				'op'    => $o[0],
+				'label' => $o[1],
+				'input' => $o[2],
 			),
-			array(
-				'op'    => 'after',
-				'label' => __( 'after', 'corinthian-admin-column-manager' ),
-				'input' => 'date',
-			),
-			array(
-				'op'    => 'within_days',
-				'label' => __( 'in the last (days)', 'corinthian-admin-column-manager' ),
-				'input' => 'number',
-			),
-			array(
-				'op'    => 'older_than_days',
-				'label' => __( 'older than (days)', 'corinthian-admin-column-manager' ),
-				'input' => 'number',
-			),
+			$ops
 		);
 	}
 
@@ -274,8 +278,8 @@ final class PostFilter {
 	/**
 	 * @return list<array<string,mixed>>
 	 */
-	public static function yes_no_ops(): array {
-		return array(
+	public static function yes_no_ops( bool $with_empty = false ): array {
+		$ops = array(
 			array(
 				'op'      => 'eq',
 				'label'   => __( 'is', 'corinthian-admin-column-manager' ),
@@ -286,6 +290,7 @@ final class PostFilter {
 				),
 			),
 		);
+		return $with_empty ? array_merge( $ops, self::empty_ops() ) : $ops;
 	}
 
 	/**
@@ -325,6 +330,7 @@ final class PostFilter {
 			'contains'     => null !== $v && '' !== $v ? $wpdb->prepare( "{$col} LIKE %s", '%' . $wpdb->esc_like( $v ) . '%' ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'not_contains' => null !== $v && '' !== $v ? $wpdb->prepare( "({$col} IS NULL OR {$col} NOT LIKE %s)", '%' . $wpdb->esc_like( $v ) . '%' ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'starts'       => null !== $v && '' !== $v ? $wpdb->prepare( "{$col} LIKE %s", $wpdb->esc_like( $v ) . '%' ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			'ends'         => null !== $v && '' !== $v ? $wpdb->prepare( "{$col} LIKE %s", '%' . $wpdb->esc_like( $v ) ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'eq'           => null !== $v ? $wpdb->prepare( "{$col} = %s", $v ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			'neq'          => null !== $v ? $wpdb->prepare( "({$col} IS NULL OR {$col} <> %s)", $v ) : null, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			default        => null,
@@ -354,6 +360,20 @@ final class PostFilter {
 	public static function date_where( string $col, string $op, mixed $value ): ?string {
 		global $wpdb;
 		$real = "{$col} <> '0000-00-00 00:00:00'";
+		if ( in_array( $op, self::RANGE_OPS, true ) ) {
+			$range = self::date_range( $op, $value );
+			if ( ! $range ) {
+				return null;
+			}
+			$parts = array();
+			if ( $range[0] ) {
+				$parts[] = $wpdb->prepare( "{$col} >= %s", $range[0]->format( 'Y-m-d H:i:s' ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
+			if ( $range[1] ) {
+				$parts[] = $wpdb->prepare( "{$col} < %s", $range[1]->format( 'Y-m-d H:i:s' ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
+			return '(' . implode( ' AND ', $parts ) . ')';
+		}
 		if ( 'within_days' === $op || 'older_than_days' === $op ) {
 			if ( ! is_scalar( $value ) || ! ctype_digit( (string) $value ) ) {
 				return null;
@@ -372,6 +392,87 @@ final class PostFilter {
 		}
 		$next = gmdate( 'Y-m-d', (int) strtotime( $value . ' 00:00:00 UTC' ) + DAY_IN_SECONDS );
 		return $wpdb->prepare( "{$col} >= %s", $next . ' 00:00:00' ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/**
+	 * Ops resolved to a half-open range of site-local time.
+	 */
+	public const RANGE_OPS = array( 'between', 'on', 'today', 'future', 'next_days', 'this_week', 'this_month' );
+
+	/**
+	 * Site-local [from, to) for a range op. Either end is null when open.
+	 * Days start at midnight in the site timezone and weeks at start_of_week.
+	 *
+	 * @return array{0:?\DateTimeImmutable,1:?\DateTimeImmutable}|null
+	 */
+	public static function date_range( string $op, mixed $value ): ?array {
+		$tz    = wp_timezone();
+		$stamp = apply_filters( 'corinthian_filter_now', null );
+		$now   = null === $stamp ? new \DateTimeImmutable( 'now', $tz ) : ( new \DateTimeImmutable( '@' . (int) $stamp ) )->setTimezone( $tz );
+		$today = $now->setTime( 0, 0 );
+		$day   = static function ( mixed $v ) use ( $tz ): ?\DateTimeImmutable {
+			if ( ! is_string( $v ) || ! preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/', $v, $m ) || ! wp_checkdate( (int) $m[2], (int) $m[3], (int) $m[1], $v ) ) {
+				return null;
+			}
+			return new \DateTimeImmutable( $v . ' 00:00:00', $tz );
+		};
+		switch ( $op ) {
+			case 'on':
+				$d = $day( $value );
+				return $d ? array( $d, $d->modify( '+1 day' ) ) : null;
+			case 'between':
+				if ( ! is_array( $value ) || 2 !== count( $value ) ) {
+					return null;
+				}
+				$a = $day( array_values( $value )[0] );
+				$b = $day( array_values( $value )[1] );
+				if ( ! $a || ! $b ) {
+					return null;
+				}
+				return $a <= $b ? array( $a, $b->modify( '+1 day' ) ) : array( $b, $a->modify( '+1 day' ) );
+			case 'today':
+				return array( $today, $today->modify( '+1 day' ) );
+			case 'future':
+				return array( $now, null );
+			case 'next_days':
+				if ( ! is_scalar( $value ) || ! ctype_digit( (string) $value ) ) {
+					return null;
+				}
+				return array( $today, $today->modify( '+' . ( (int) $value + 1 ) . ' days' ) );
+			case 'this_week':
+				$back  = ( (int) $today->format( 'w' ) - (int) get_option( 'start_of_week', 1 ) + 7 ) % 7;
+				$start = $today->modify( "-{$back} days" );
+				return array( $start, $start->modify( '+7 days' ) );
+			case 'this_month':
+				$start = $today->modify( 'first day of this month' );
+				return array( $start, $start->modify( '+1 month' ) );
+		}
+		return null;
+	}
+
+	/**
+	 * Same ranges against a meta value stored as Y-m-d or as a Unix timestamp.
+	 */
+	public static function meta_date_where( string $col, string $op, mixed $value ): ?string {
+		global $wpdb;
+		$range = self::date_range( $op, $value );
+		if ( ! $range ) {
+			return null;
+		}
+		// A Y-m-d value counts as midnight, so the first date at or after an instant is its date, or the next day when it falls mid-day.
+		$ceil     = static fn( \DateTimeImmutable $t ): string => ( '00:00:00' === $t->format( 'H:i:s' ) ? $t : $t->setTime( 0, 0 )->modify( '+1 day' ) )->format( 'Y-m-d' );
+		$day      = "SUBSTRING({$col}, 1, 10)";
+		$by_day   = array( "{$col} REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}'" );
+		$by_stamp = array( "{$col} REGEXP '^[0-9]{9,11}$'" );
+		if ( $range[0] ) {
+			$by_day[]   = $wpdb->prepare( "{$day} >= %s", $ceil( $range[0] ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$by_stamp[] = $wpdb->prepare( "CAST({$col} AS UNSIGNED) >= %d", $range[0]->getTimestamp() ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		}
+		if ( $range[1] ) {
+			$by_day[]   = $wpdb->prepare( "{$day} < %s", $ceil( $range[1] ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$by_stamp[] = $wpdb->prepare( "CAST({$col} AS UNSIGNED) < %d", $range[1]->getTimestamp() ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		}
+		return '((' . implode( ' AND ', $by_day ) . ') OR (' . implode( ' AND ', $by_stamp ) . '))';
 	}
 
 	public static function in_where( string $col, string $op, mixed $value, bool $ints = false ): ?string {

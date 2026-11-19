@@ -96,12 +96,20 @@ final class AuthorType extends AbstractPostType implements Sortable, Filterable,
 	}
 
 	public function filter_operators( Config $config, Screen $screen ): array {
-		return PostFilter::in_ops( PostFilter::author_options() );
+		return PostFilter::in_ops( PostFilter::author_options(), true );
 	}
 
 	public function filter_condition( Config $config, string $op, mixed $value, Screen $screen, string $alias ): ?array {
 		global $wpdb;
-		return PostFilter::wrap( PostFilter::in_where( "{$wpdb->posts}.post_author", $op, $value, true ) );
+		$col = "{$wpdb->posts}.post_author";
+		$has = "EXISTS (SELECT 1 FROM {$wpdb->users} AS {$alias} WHERE {$alias}.ID = {$col})";
+		return PostFilter::wrap(
+			match ( $op ) {
+				'empty'     => "NOT {$has}",
+				'not_empty' => $has,
+				default     => PostFilter::in_where( $col, $op, $value, true ),
+			}
+		);
 	}
 
 	protected function edit_kind(): string {
