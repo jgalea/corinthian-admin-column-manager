@@ -148,7 +148,7 @@ final class FilterValues {
 			'number'     => $per_page + 1,
 			'offset'     => ( max( 1, $page ) - 1 ) * $per_page,
 			'orderby'    => 'name',
-			'fields'     => 'id=>name',
+			'fields'     => 'all',
 		);
 		if ( '' !== $search ) {
 			$args['name__like'] = $search;
@@ -171,7 +171,7 @@ final class FilterValues {
 					'taxonomy'   => $taxonomy,
 					'hide_empty' => false,
 					'include'    => $ids,
-					'fields'     => 'id=>name',
+					'fields'     => 'all',
 				)
 			)
 		);
@@ -223,13 +223,28 @@ final class FilterValues {
 	}
 
 	/**
-	 * @param array<int|string,string>|\WP_Error|string $terms
+	 * Terms in a hierarchical taxonomy are labelled with their parents, so
+	 * two terms that share a name stay distinguishable.
+	 *
+	 * @param array<int|string,\WP_Term>|\WP_Error|string $terms
 	 * @return array<string,string>
 	 */
 	private static function term_rows( $terms ): array {
 		$out = array();
-		foreach ( is_array( $terms ) ? $terms : array() as $id => $name ) {
-			$out[ (string) $id ] = self::label( wp_specialchars_decode( (string) $name, ENT_QUOTES ), (int) $id );
+		foreach ( is_array( $terms ) ? $terms : array() as $term ) {
+			if ( ! $term instanceof \WP_Term ) {
+				continue;
+			}
+			$names = array( $term->name );
+			if ( $term->parent && is_taxonomy_hierarchical( $term->taxonomy ) ) {
+				foreach ( get_ancestors( $term->term_id, $term->taxonomy, 'taxonomy' ) as $ancestor ) {
+					$parent = get_term( $ancestor, $term->taxonomy );
+					if ( $parent instanceof \WP_Term ) {
+						array_unshift( $names, $parent->name );
+					}
+				}
+			}
+			$out[ (string) $term->term_id ] = self::label( wp_specialchars_decode( implode( ' › ', $names ), ENT_QUOTES ), (int) $term->term_id );
 		}
 		return $out;
 	}
