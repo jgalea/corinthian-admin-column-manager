@@ -30,6 +30,11 @@ final class TermMetaType extends AbstractMetaType {
 		return 't.term_id';
 	}
 
+	protected function meta_scope( Screen $screen ): string {
+		global $wpdb;
+		return $wpdb->prepare( "INNER JOIN {$wpdb->term_taxonomy} AS x ON x.term_id = m.term_id AND x.taxonomy = %s", $screen->subtype() ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
 	protected function read_meta( int $object_id, string $key ): array {
 		return get_term_meta( $object_id, $key, false );
 	}
